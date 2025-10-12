@@ -2,10 +2,6 @@ require("lua.defaults")
 require("lua.states")
 require("lua.game")
 
-function love.load()
-    love.graphics.setBackgroundColor(0.03, 0.03, 0.03)
-end
-
 function love.keypressed(key)
     gameKey(key)
 end

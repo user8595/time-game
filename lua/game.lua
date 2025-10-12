@@ -4,6 +4,7 @@ local modeStrings = {
     "Play endlessly.",
     "Play while the game's speed changes every hit."
 }
+local seType = 0
 
 function gameInit()
     pf, great, good, miss = 0, 0, 0, 0
@@ -21,6 +22,7 @@ function gameInit()
     speed = 1
     lastTimer = 0
     TimingTimer = 0
+    seType = 0
     lifeBar = 100
     isPaused = false
     isFail = false
@@ -35,7 +37,17 @@ function keyInit()
     lastTimingTimer = TimingTimer
     TimingTimer = 0
     isMiss = false
+    seType = seType + 1
 
+    if seType % 1 == 0 then
+        love.audio.play(se.hit_1)
+        love.audio.stop(se.hit_2)
+    end
+    if seType % 2 == 0 then
+        love.audio.stop(se.hit_1)
+        love.audio.play(se.hit_2)
+    end
+    
     if mode == 2 then
         speed = 1 * (0.1 * love.math.random(10, spdMax))
     end

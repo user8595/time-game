@@ -226,6 +226,7 @@ function gameLoop(dt)
                 miss = miss + 1
                 lifeBar = lifeBar - 6
                 isMiss = true
+                love.audio.play(se.miss)
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
             end
         elseif mode == 2 then
@@ -237,10 +238,11 @@ function gameLoop(dt)
                 lifeBar = lifeBar - 6
                 isMiss = true
                 speed = 1
+                love.audio.play(se.miss)
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
             end
         end
-
+        
         if buttonTime < 1 then
             buttonCol[4] = buttonCol[4] + dt
             buttonRed[4] = buttonRed[4] + dt

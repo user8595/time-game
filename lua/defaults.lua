@@ -1,3 +1,14 @@
+function love.load()
+    love.graphics.setBackgroundColor(0.03, 0.03, 0.03)
+    -- game audio
+    se = {
+        --TODO: Improve miss sound effect
+        miss = love.audio.newSource("/assets/se/miss.wav", "static"),
+        hit_1 = love.audio.newSource("/assets/se/hit_1.wav", "static"),
+        hit_2 = love.audio.newSource("/assets/se/hit_2.wav", "static"),
+    }
+end
+
 wWidth, wHeight = love.graphics.getWidth(), love.graphics.getHeight()
 gWidth, gHeight = 220, 280
 

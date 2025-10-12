@@ -1,1 +1,1 @@
-Add sound effects for miss and hit events
+Add sound effects for menu navigation
