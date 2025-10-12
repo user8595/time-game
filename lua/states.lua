@@ -214,6 +214,7 @@ function gameLoop(dt)
             lifeBar = 100
         end
         if lifeBar < 1 then
+            lifeBar = 0
             isFail = true
         end
 
@@ -223,7 +224,7 @@ function gameLoop(dt)
                 timer = 0
                 TimingTimer = 0
                 miss = miss + 1
-                lifeBar = lifeBar - 4
+                lifeBar = lifeBar - 6
                 isMiss = true
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
             end
@@ -233,7 +234,7 @@ function gameLoop(dt)
                 timer = 0
                 TimingTimer = 0
                 miss = miss + 1
-                lifeBar = lifeBar - 4
+                lifeBar = lifeBar - 6
                 isMiss = true
                 speed = 1
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
