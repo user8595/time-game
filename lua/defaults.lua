@@ -17,14 +17,19 @@ buttonTime = 0
 speed = 1
 timer = 0
 lastTimer = 0
+globalTimer = 0
+lastGlobalTimer = 0
 
-isPF = false
+-- hide timing text?
+isMiss = true
 animHitTime = 0
 
 width = 120
 pW = width * (timer / 1.25)
 
 pf, great, good, miss = 0, 0, 0, 0
+-- timing effect object
+timingEffect, pfEffect, msEffect = {}, {}, {}
 
 buttonCol, textCol = {1, 1, 1, 0}, {0, 0, 0, 0}
 timingCol = {
@@ -34,8 +39,7 @@ timingCol = {
     {0.25, 0.5, 1, 1},
     {1, 1, 1, 1}
 }
-timingHit = {0.5, 1, 1, 0}
-tipCol = {0.75, 0.5, 0.2}
+tipCol = {0.95, 0.7, 0.4}
 white = {1, 1, 1, 1}
 
 tCol = timingCol[1]

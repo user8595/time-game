@@ -1,3 +1,5 @@
+local progX = (gWidth - 120) / 2
+
 function gameDisplay()
     love.graphics.push()
     love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23)
@@ -28,44 +30,34 @@ function gameKey(key)
     if state == "game" then        
         if not isPaused then
             if key == "space" and timer > 0.75 and timer < 0.85 then
+                table.insert(timingEffect, {{0.25, 0.5, 1, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
                 good = good + 1
-                lastTimer = timer
-                timer = 0
-                buttonCol[4] = 0
-                buttonTime = 0
+                keyInit()
             end
             
             if key == "space" and timer > 0.85 and timer < 0.95 then
+                table.insert(timingEffect, {{1, 0.5, 0.25, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
                 great = great + 1
-                lastTimer = timer
-                timer = 0
-                buttonCol[4] = 0
-                buttonTime = 0
+                keyInit()
             end
         
             if key == "space" and timer > 0.95 and timer < 1.05 then
+                table.insert(timingEffect, {{0.5, 1, 1, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
+                table.insert(pfEffect, {{0.5, 1, 1, 1}, progX + 88, 58, 13, 18, 0})
                 pf = pf + 1
-                lastTimer = timer
-                timer = 0
-                buttonCol[4] = 0
-                buttonTime = 0
-                isPF = true
+                keyInit()
             end
         
             if key == "space" and timer > 1.05 and timer < 1.15 then
+                table.insert(timingEffect, {{1, 0.5, 0.25, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
                 great = great + 1
-                lastTimer = timer
-                timer = 0
-                buttonCol[4] = 0
-                buttonTime = 0
+                keyInit()
             end
         
             if key == "space" and timer > 1.15 and timer < 1.25 then
+                table.insert(timingEffect, {{0.25, 0.5, 1, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
                 good = good + 1
-                lastTimer = timer
-                timer = 0
-                buttonCol[4] = 0
-                buttonTime = 0
+                keyInit()
             end
         
             if key == "up" then
@@ -73,6 +65,7 @@ function gameKey(key)
                 buttonTime = 0
                 timer = 0
                 lastTimer = 0
+                globalTimer = 0
                 buttonCol[4] = 0
                 textCol[4] = 0
             end
@@ -82,6 +75,7 @@ function gameKey(key)
                 buttonTime = 0
                 timer = 0
                 lastTimer = 0
+                globalTimer = 0
                 buttonCol[4] = 0
                 textCol[4] = 0
             end
@@ -127,9 +121,10 @@ end
 function gameLoop(dt)
     if not isPaused and state == "game" then
         pW = width * (timer / 1.25)
-
+        globalTimer = globalTimer + dt
         timer = timer + dt * speed
         buttonTime = buttonTime + dt * speed
+        
         if isPF then
             animHitTime = animHitTime + dt
         end
@@ -137,16 +132,40 @@ function gameLoop(dt)
         if timer > 1.25 then
             lastTimer = timer
             timer = 0
+            globalTimer = 0
             miss = miss + 1
+            isMiss = true
+            table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
         end
+
         if buttonTime < 1 then
             buttonCol[4] = buttonCol[4] + dt
             textCol[4] = textCol[4] + dt
         end
+        
         if buttonTime > 1 and timer < 1 then
             buttonCol[4] = 0
             textCol[4] = 0
             buttonTime = 0
+        end
+
+        if speed < 0.1 then
+            speed = 0.1
+        end
+        if speed > 4 then
+            speed = 4
+        end
+        
+        if animHitTime > 0 and animHitTime < 0.1 then
+            timingHit[4] = 1
+        end
+        if animHitTime > 0.1 and animHitTime < 0.5 then
+            timingHit[4] = timingHit[4] - dt * 5
+        end
+        if animHitTime > 0.5 then
+            isPF = false
+            animHitTime = 0
+            timingHit[4] = 0
         end
 
         if timer > 0.75 and timer < 0.85 then
@@ -162,20 +181,44 @@ function gameLoop(dt)
         else
             tCol = timingCol[5]
         end
-        if speed < 0 then
-            speed = 0
+
+        -- object hit effect
+        -- values: colour, x, y, w, h, timer
+        -- see in gameKey(key)
+        for i, v in ipairs(timingEffect) do
+            v[6] = v[6] + dt
+
+            if v[6] > 0 then
+                v[1][4] = v[1][4] - dt * 3
+            end
+
+            if v[6] > 0.75 then
+                table.remove(timingEffect, i)
+            end
         end
 
-        if animHitTime > 0 and animHitTime < 0.1 then
-            timingHit[4] = 1
+        for i, v in ipairs(pfEffect) do
+            v[6] = v[6] + dt
+
+            if v[6] > 0 then
+                v[1][4] = v[1][4] - dt * 3
+            end
+
+            if v[6] > 0.75 then
+                table.remove(pfEffect, i)
+            end
         end
-        if animHitTime > 0.1 and animHitTime < 0.5 then
-            timingHit[4] = timingHit[4] - dt * 5
-        end
-        if animHitTime > 0.5 then
-            isPF = false
-            animHitTime = 0
-            timingHit[4] = 0
+
+        for i, v in ipairs(msEffect) do
+            v[6] = v[6] + dt
+
+            if v[6] > 0 then
+                v[1][4] = v[1][4] - dt * 3
+            end
+
+            if v[6] > 0.75 then
+                table.remove(msEffect, i)
+            end
         end
     end
 
