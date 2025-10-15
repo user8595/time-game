@@ -21,7 +21,9 @@ font = {
 }
 
 isPaused = false
-isFail = fail
+isCountdown = false
+countdownCool = 0
+isFail = false
 isDebug = false
 isExit = 0 -- -1 = mode & popups, 0 = game, 1 = exit game
 
@@ -49,6 +51,10 @@ pf, great, good, miss = 0, 0, 0, 0
 
 -- life bar
 lifeBar = 100
+
+keys = {
+    hit = "space",
+}
 
 -- timing effect object
 timingEffect, pfEffect, msEffect = {}, {}, {}

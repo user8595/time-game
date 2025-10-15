@@ -4,7 +4,7 @@ local modeStrings = {
     "Play endlessly.",
     "Play while the game's speed changes every hit."
 }
-local seType = 0
+seType = 0
 
 function gameInit()
     pf, great, good, miss = 0, 0, 0, 0
@@ -137,6 +137,15 @@ function gameUI()
     end
 end
 
+function countdownUI()
+    love.graphics.setColor(1, 1, 1)
+    if countdownCool > 0 and countdownCool < 1 then
+        love.graphics.printf("READY", font[3], 0, 95, gWidth, "center")
+    elseif countdownCool > 1 then
+        love.graphics.printf("GO!!", font[3], 0, 95, gWidth, "center")
+    end
+end
+
 function titleUI()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf("time", font[3], 0, 12, gWidth, "center")
@@ -159,9 +168,19 @@ function modeUI()
     elseif mode == 2 then
         love.graphics.printf(modeStrings[2], font[2], 0, gHeight - 70, gWidth, "center")
         if spdMax < 30 then
-            love.graphics.printf({red, "max ", white, 1 * (0.1 * spdMax) .. "x"}, font[2], 0, gHeight - 90, gWidth, "center")
+            if spdMax == 10 then
+                love.graphics.printf({red, "max ", white, 1 * (0.1 * spdMax) .. "x >"}, font[2], 0, gHeight - 90, gWidth, "center")
+            elseif spdMax == 40 then
+                love.graphics.printf({white, "< ", red, "max ", white, 1 * (0.1 * spdMax) .. "x"}, font[2], 0, gHeight - 90, gWidth, "center")
+            else
+                love.graphics.printf({white, "< ", red, "max ", white, 1 * (0.1 * spdMax) .. "x >"}, font[2], 0, gHeight - 90, gWidth, "center")
+            end
         else
-            love.graphics.printf({red, "max ", 1 * (0.1 * spdMax) .. "x"}, font[2], 0, gHeight - 90, gWidth, "center")
+            if spdMax == 40 then
+                love.graphics.printf({white, "< ", red, "max ", 1 * (0.1 * spdMax) .. "x"}, font[2], 0, gHeight - 90, gWidth, "center")
+            else
+                love.graphics.printf({white, "< ", red, "max ", 1 * (0.1 * spdMax) .. "x", white, " >"}, font[2], 0, gHeight - 90, gWidth, "center")
+            end
         end
     end
 end
@@ -169,13 +188,13 @@ end
 function pauseUI()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf("- PAUSED -", font[3], 0, 50, gWidth, "center")
-    love.graphics.printf("Escape: Exit\nP: Unpause\nR: Reset", font[1], 0, 195, gWidth, "center")
+    love.graphics.printf({{1, 0.5, 0.25}, "Escape:", {1, 1, 1}, " Exit", {1, 1, 0.35}, "\nP:", {1, 1, 1}, " Unpause", {0.95, 0.7, 0}, "\nR:", {1, 1, 1}, " Reset"}, font[1], 0, 195, gWidth, "center")
 end
 
 function failUI()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf({{0.95, 0.7, 0.4}, "- RESULTS -"}, font[3], 0, 30, gWidth, "center")
-    love.graphics.printf({timingCol[2], "PF: " .. pf, timingCol[3], "\nGR: " .. great, timingCol[4], "\nGD: " .. good, timingCol[1], "\nMS: " .. miss}, font[1], 0, 58, gWidth, "center")
+    love.graphics.printf({timingCol[2], "PF: " .. pf, timingCol[3], "\nGR: " .. great, timingCol[4], "\nGD: " .. good, timingCol[1], "\nMS: " .. miss, {1, 1, 1}, "\nTOTAL: " .. pf + great + good}, font[1], 0, 58, gWidth, "center")
     
     if mode == 2 then
         if spdMax < 30 then
@@ -185,7 +204,8 @@ function failUI()
         end
     end
     
-    love.graphics.printf("Press Escape to exit", font[2], 0, 190, gWidth, "center")
+    love.graphics.printf({{1, 0.5, 0.25}, "Escape", {1, 1, 1}, " to exit"}, font[2], 0, 190, gWidth, "center")
+    love.graphics.printf({{0.95, 0.7, 0.2}, "R", {1, 1, 1}, " to restart"}, font[2], 0, 207, gWidth, "center")
 end
 
 function debugUI()

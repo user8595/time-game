@@ -6,7 +6,7 @@ function gameDisplay()
     gameUI()
     love.graphics.pop()
     
-    if state == "title" or state == "mode" or isPaused or isFail then
+    if state == "title" or state == "mode" or isPaused or isFail or isCountdown then
         gameOverlay()
     else
     end
@@ -22,6 +22,9 @@ function gameDisplay()
     if isFail then
         failUI()
     end
+    if isCountdown then
+        countdownUI()
+    end
     love.graphics.pop()
     
     if isPaused then
@@ -34,22 +37,22 @@ end
 
 function gameKey(key)
     if state == "game" then
-        if not isPaused and not isFail then
-            if key == "space" and timer > 0.75 and timer < 0.85 then
+        if not isPaused and not isFail and not isCountdown then
+            if key == keys.hit and timer > 0.75 and timer < 0.85 then
                 table.insert(timingEffect, {{0.25, 0.5, 1, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
                 good = good + 1
                 lifeBar = lifeBar + 3
                 keyInit()
             end
             
-            if key == "space" and timer > 0.85 and timer < 0.95 then
+            if key == keys.hit and timer > 0.85 and timer < 0.95 then
                 table.insert(timingEffect, {{1, 0.5, 0.25, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
                 great = great + 1
                 lifeBar = lifeBar + 4
                 keyInit()
             end
         
-            if key == "space" and timer > 0.95 and timer < 1.05 then
+            if key == keys.hit and timer > 0.95 and timer < 1.05 then
                 table.insert(timingEffect, {{0.5, 1, 1, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
                 table.insert(pfEffect, {{0.5, 1, 1, 1}, progX + 88, 58, 13, 18, 0})
                 pf = pf + 1
@@ -57,14 +60,14 @@ function gameKey(key)
                 keyInit()
             end
         
-            if key == "space" and timer > 1.05 and timer < 1.15 then
+            if key == keys.hit and timer > 1.05 and timer < 1.15 then
                 table.insert(timingEffect, {{1, 0.5, 0.25, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
                 great = great + 1
                 lifeBar = lifeBar + 4
                 keyInit()
             end
         
-            if key == "space" and timer > 1.15 and timer < 1.25 then
+            if key == keys.hit and timer > 1.15 and timer < 1.25 then
                 table.insert(timingEffect, {{0.25, 0.5, 1, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
                 good = good + 1
                 lifeBar = lifeBar + 3
@@ -95,7 +98,7 @@ function gameKey(key)
         end
         
         
-        if key == "p" and not isFail then
+        if key == "p" and not isFail and not isCountdown then
             if not isPaused then
                 isPaused = true
             else
@@ -109,8 +112,9 @@ function gameKey(key)
             state = "title"
         end
 
-        if key == "space" or key == "return" then
+        if key == keys.hit or key == "return" then
             state = "game"
+            isCountdown = true
             isExit = -1
         end
 
@@ -135,7 +139,7 @@ function gameKey(key)
     end
 
     if state == "title" then
-        if key == "space" or key == "return" then
+        if key == keys.hit or key == "return" then
             state = "mode"
             mode = 1
             selY = 64
@@ -154,6 +158,11 @@ function gameKey(key)
             gameInit()
             state = "title"
             isExit = -1
+        end
+        if key == "r" then
+            gameInit()
+            isCountdown = true
+            isFail = false
         end
     end
 
@@ -199,7 +208,16 @@ function gameLoop(dt)
         spdMax = 10
     end
 
-    if not isPaused and not isFail and state == "game" then
+    if isCountdown then
+        countdownCool = countdownCool + dt
+    end
+
+    if countdownCool > 2 then
+        isCountdown = false
+        countdownCool = 0
+    end
+
+    if not isPaused and not isFail and not isCountdown and state == "game" then
         pW = width * (timer / 1.25)
         TimingTimer = TimingTimer + dt
         timer = timer + dt * speed
@@ -224,7 +242,8 @@ function gameLoop(dt)
                 timer = 0
                 TimingTimer = 0
                 miss = miss + 1
-                lifeBar = lifeBar - 6
+                lifeBar = lifeBar - 12
+                seType = 0
                 isMiss = true
                 love.audio.play(se.miss)
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
@@ -235,7 +254,8 @@ function gameLoop(dt)
                 timer = 0
                 TimingTimer = 0
                 miss = miss + 1
-                lifeBar = lifeBar - 6
+                lifeBar = lifeBar - 12
+                seType = 0
                 isMiss = true
                 speed = 1
                 love.audio.play(se.miss)
