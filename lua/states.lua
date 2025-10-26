@@ -2,7 +2,7 @@ local progX = (gWidth - 120) / 2
 
 function gameDisplay()
     love.graphics.push()
-    love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23)
+    love.graphics.translate(tX, tY)
     gameUI()
     love.graphics.pop()
     
@@ -10,7 +10,7 @@ function gameDisplay()
         gameOverlay()
     else
     end
-
+    
     love.graphics.push()
     love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23)
     if state == "title" then
@@ -73,10 +73,10 @@ function gameKey(key)
                 lifeBar = lifeBar + 3
                 keyInit()
             end
-        
+            
             if mode == 1 then
                 if key == "up" and speed < 4 then
-                    speed = speed + .1
+                    speed = speed + .05
                     buttonTime = 0
                     timer = 0
                     lastTimer = 0
@@ -86,7 +86,7 @@ function gameKey(key)
                 end
                 
                 if key == "down" and speed > 0.1 then
-                    speed = speed - .1
+                    speed = speed - .05
                     buttonTime = 0
                     timer = 0
                     lastTimer = 0
@@ -186,6 +186,23 @@ function gameKey(key)
 end
 
 function gameLoop(dt)
+    bpm = 60 * speed
+
+    if isShake then
+        shakeTime = shakeTime + dt
+    else
+        tX, tY = (wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23
+    end
+
+    if shakeTime > 0 and isShake then
+        tX, tY = (wWidth - gWidth) / 2 + love.math.random(2.25, -2.25), (wHeight - gHeight) / 2 + 23 + love.math.random(2.25, -2.25)
+    end
+
+    if shakeTime > 0.05 and isShake then
+        shakeTime = 0
+        isShake = false
+    end
+
     if isExit == 1 then
         love.event.quit(0)
     end
@@ -242,10 +259,11 @@ function gameLoop(dt)
                 timer = 0
                 TimingTimer = 0
                 miss = miss + 1
-                lifeBar = lifeBar - 12
+                lifeBar = lifeBar - 16
                 seType = 0
                 isMiss = true
                 love.audio.play(se.miss)
+                isShake = true
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
             end
         elseif mode == 2 then
@@ -254,11 +272,12 @@ function gameLoop(dt)
                 timer = 0
                 TimingTimer = 0
                 miss = miss + 1
-                lifeBar = lifeBar - 12
+                lifeBar = lifeBar - 16
                 seType = 0
                 isMiss = true
                 speed = 1
                 love.audio.play(se.miss)
+                isShake = true
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
             end
         end
@@ -309,9 +328,6 @@ function gameLoop(dt)
             tCol = timingCol[5]
         end
 
-        -- object hit effect
-        -- values: colour, x, y, w, h, timer
-        -- see in gameKey(key)
         for i, v in ipairs(timingEffect) do
             v[6] = v[6] + dt
 

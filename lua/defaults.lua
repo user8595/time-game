@@ -1,17 +1,6 @@
-function love.load()
-    love.graphics.setBackgroundColor(0.03, 0.03, 0.03)
-    -- game audio
-    se = {
-        --TODO: Improve miss sound effect
-        miss = love.audio.newSource("/assets/se/miss.wav", "static"),
-        hit_1 = love.audio.newSource("/assets/se/hit_1.wav", "static"),
-        hit_2 = love.audio.newSource("/assets/se/hit_2.wav", "static"),
-    }
-end
-
 wWidth, wHeight = love.graphics.getWidth(), love.graphics.getHeight()
 gWidth, gHeight = 220, 280
-
+tX, tY = (wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23
 ver = "v1.0"
 
 font = {
@@ -25,6 +14,8 @@ isCountdown = false
 countdownCool = 0
 isFail = false
 isDebug = false
+isShake = false
+shakeTime = 0
 isExit = 0 -- -1 = mode & popups, 0 = game, 1 = exit game
 
 state = "title"
@@ -36,6 +27,7 @@ timer = 0
 lastTimer = 0
 TimingTimer = 0
 lastTimingTimer = 0
+bpm = 60 * speed
 
 -- hide timing text
 isMiss = true
@@ -60,7 +52,7 @@ keys = {
 timingEffect, pfEffect, msEffect = {}, {}, {}
 
 buttonCol, textCol = {1, 1, 1, 0}, {0, 0, 0, 0}
-buttonRed = {1, 0.15, 0.15, 0}
+buttonRed = {1, 0.5, 0.5, 0}
 
 timingCol = {
     {1, 0.25, 0.25, 1},

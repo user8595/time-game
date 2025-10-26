@@ -4,6 +4,8 @@ local modeStrings = {
     "Play endlessly.",
     "Play while the game's speed changes every hit."
 }
+local totalLife = -215
+local currLife = (lifeBar / 100)
 seType = 0
 
 function gameInit()
@@ -100,30 +102,40 @@ function gameUI()
     love.graphics.setColor(white)
     love.graphics.printf({timingCol[2], "perfect " .. pf, timingCol[3], "\ngreat " .. great, timingCol[4], "\ngood " .. good, timingCol[1], "\nmiss " .. miss}, font[1], 0, 110, gWidth, "center")
     
+    totalLife = -215
+    currLife = (lifeBar / 100)
+    
     if lifeBar > 15 then
         love.graphics.setColor(white)
     else
         love.graphics.setColor(red)
     end
-    love.graphics.rectangle("fill", gWidth - 15, 12 + 215, 7, -215 * (lifeBar / 100))
 
-    love.graphics.printf({tipCol, "\nspeed: " .. string.format("%.1f", speed) .. "x"}, font[2], 0, 68, gWidth, "center")
+    -- any better solution though
+    if lifeBar <= 0 then
+        love.graphics.setColor(0, 0, 0, 0)
+    end
+
+    love.graphics.rectangle("fill", gWidth - 15, 12 + 215, 7, totalLife * currLife)
+
+    love.graphics.setColor(white)
+    love.graphics.printf({tipCol, "\nspeed: " .. string.format("%.2f", speed) .. "x" .. "\nbpm: " .. bpm}, font[2], 0, 68, gWidth, "center")
 
     if lastTimer > 0.75 and lastTimer < 0.85 then
         love.graphics.setColor(timingCol[4])
-        love.graphics.printf("GOOD", font[3], 10, 205, gWidth - 24, "center")
+        love.graphics.printf("-GOOD", font[3], 10, 205, gWidth - 24, "center")
     elseif lastTimer > 0.85 and lastTimer < 0.95 then
         love.graphics.setColor(timingCol[3])
-        love.graphics.printf("GREAT", font[3], 10, 205, gWidth - 24, "center")
+        love.graphics.printf("-GREAT", font[3], 10, 205, gWidth - 24, "center")
     elseif lastTimer > 0.95 and lastTimer < 1.05 then
         love.graphics.setColor(timingCol[2])
         love.graphics.printf("PERFECT!!", font[3], 10, 205, gWidth - 24, "center")
     elseif lastTimer > 1.05 and lastTimer < 1.15 then
         love.graphics.setColor(timingCol[3])
-        love.graphics.printf("GREAT", font[3], 10, 205, gWidth - 24, "center")
+        love.graphics.printf("GREAT-", font[3], 10, 205, gWidth - 24, "center")
     elseif lastTimer > 1.15 and lastTimer < 1.25 then
         love.graphics.setColor(timingCol[4])
-        love.graphics.printf("GOOD", font[3], 10, 205, gWidth - 24, "center")
+        love.graphics.printf("GOOD-", font[3], 10, 205, gWidth - 24, "center")
     elseif lastTimer > 1.25 then
         love.graphics.setColor(timingCol[1])
         love.graphics.printf("MISS", font[3], 10, 205, gWidth - 24, "center")
