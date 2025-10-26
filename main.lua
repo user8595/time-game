@@ -6,10 +6,11 @@ function love.load()
     love.graphics.setBackgroundColor(0.03, 0.03, 0.03)
     -- game audio
     se = {
-        --TODO: Improve miss sound effect and add menu sound effects
         miss = love.audio.newSource("/assets/se/miss.wav", "static"),
         hit_1 = love.audio.newSource("/assets/se/hit_1.wav", "static"),
         hit_2 = love.audio.newSource("/assets/se/hit_2.wav", "static"),
+        sel_1 = love.audio.newSource("/assets/se/sel_1.wav", "static"),
+        sel_2 = love.audio.newSource("/assets/se/sel_2.wav", "static"),
     }
 end
 

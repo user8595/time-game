@@ -83,6 +83,7 @@ function gameKey(key)
                     TimingTimer = 0
                     buttonCol[4] = 0
                     textCol[4] = 0
+                    love.audio.play(se.sel_1)
                 end
                 
                 if key == "down" and speed > 0.1 then
@@ -93,6 +94,7 @@ function gameKey(key)
                     TimingTimer = 0
                     buttonCol[4] = 0
                     textCol[4] = 0
+                    love.audio.play(se.sel_1)
                 end
             end
         end
@@ -101,8 +103,10 @@ function gameKey(key)
         if key == "p" and not isFail and not isCountdown then
             if not isPaused then
                 isPaused = true
+                love.audio.play(se.sel_1)
             else
                 isPaused = false
+                love.audio.play(se.sel_1)
             end
         end
     end
@@ -110,30 +114,36 @@ function gameKey(key)
     if state == "mode" then
         if key == "escape" then
             state = "title"
+            love.audio.play(se.sel_2)
         end
 
         if key == keys.hit or key == "return" then
             state = "game"
             isCountdown = true
             isExit = -1
+            love.audio.play(se.sel_2)
         end
 
         if key == "up" then
             mode = mode - 1
             selY = selY - 26
+            love.audio.play(se.sel_1)
         end
         if key == "down" then
             mode = mode + 1
             selY = selY + 26
+            love.audio.play(se.sel_1)
         end
 
         if mode == 2 then            
             if key == "left" then
                 spdMax = spdMax - 1
+                love.audio.play(se.sel_1)
             end
             
             if key == "right" then
                 spdMax = spdMax + 1
+                love.audio.play(se.sel_1)
             end
         end
     end
@@ -144,12 +154,14 @@ function gameKey(key)
             mode = 1
             selY = 64
             isExit = -1
+            love.audio.play(se.sel_2)
         end
     end
     
     if isPaused then
         if key == "r" then
             gameInit()
+            love.audio.play(se.sel_2)
         end
     end
 
@@ -158,21 +170,26 @@ function gameKey(key)
             gameInit()
             state = "title"
             isExit = -1
+            love.audio.play(se.sel_2)
         end
         if key == "r" then
             gameInit()
             isCountdown = true
             isFail = false
+            love.audio.play(se.sel_2)
         end
     end
 
     if key == "escape" and state == "title" then
         isExit = isExit + 1
+        love.audio.play(se.sel_2)
     elseif key == "escape" and state == "mode" then
         state = "title"
+        love.audio.play(se.sel_2)
     elseif key == "escape" and state == "game" and isPaused then
         state = "title"
         isExit = 0
+        love.audio.play(se.sel_2)
         gameInit()
     end
     
@@ -229,9 +246,20 @@ function gameLoop(dt)
         countdownCool = countdownCool + dt
     end
 
+    if countdownCool > 0 and countdownCool < 0.025 then
+        se.sel_2:setPitch(1)
+        love.audio.play(se.sel_2)
+    end
+    
+    if countdownCool > 1 and countdownCool < 1.025 then
+        se.sel_2:setPitch(0.75)
+        love.audio.play(se.sel_2)
+    end
+
     if countdownCool > 2 then
         isCountdown = false
         countdownCool = 0
+        se.sel_2:setPitch(1)
     end
 
     if not isPaused and not isFail and not isCountdown and state == "game" then
@@ -249,12 +277,13 @@ function gameLoop(dt)
             lifeBar = 100
         end
         if lifeBar < 1 then
+            se.miss:setPitch(0.9)
             lifeBar = 0
             isFail = true
         end
 
         if mode == 1 then
-            if timer > 1.25 then
+            if timer > 1.25 and lifeBar > 0 then
                 lastTimer = timer
                 timer = 0
                 TimingTimer = 0
@@ -267,7 +296,7 @@ function gameLoop(dt)
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
             end
         elseif mode == 2 then
-            if timer > 1.25 then
+            if timer > 1.25 and lifeBar > 0 then
                 lastTimer = timer
                 timer = 0
                 TimingTimer = 0
@@ -282,6 +311,7 @@ function gameLoop(dt)
             end
         end
         
+
         if buttonTime < 1 then
             buttonCol[4] = buttonCol[4] + dt
             buttonRed[4] = buttonRed[4] + dt

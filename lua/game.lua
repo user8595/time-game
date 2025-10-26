@@ -28,6 +28,7 @@ function gameInit()
     lifeBar = 100
     isPaused = false
     isFail = false
+    se.miss:setPitch(1)
 end
 
 function keyInit()
