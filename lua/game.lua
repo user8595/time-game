@@ -26,6 +26,7 @@ function gameInit()
     TimingTimer = 0
     seType = 0
     lifeBar = 100
+    currP, maxP, pDisplay = 0, 0, 0
     isPaused = false
     isFail = false
     se.miss:setPitch(1)
@@ -120,7 +121,7 @@ function gameUI()
     love.graphics.rectangle("fill", gWidth - 15, 12 + 215, 7, totalLife * currLife)
 
     love.graphics.setColor(white)
-    love.graphics.printf({tipCol, "\nspeed: " .. string.format("%.2f", speed) .. "x" .. "\nbpm: " .. bpm}, font[2], 0, 68, gWidth, "center")
+    love.graphics.printf({tipCol, "\nspeed: " .. string.format("%.2f", speed) .. "x\n" .. bpm .. " bpm"}, font[2], 0, 68, gWidth, "center")
 
     if lastTimer > 0.75 and lastTimer < 0.85 then
         love.graphics.setColor(timingCol[4])
@@ -143,6 +144,13 @@ function gameUI()
     else
         love.graphics.setColor(tipCol)
         love.graphics.printf("Press SPACE on blue", font[2], 10, 212, gWidth - 24, "center")
+    end    
+
+    love.graphics.setColor(white)
+    if pDisplay == 0 then
+        love.graphics.printf({tipCol, "0%"}, font[2], 10, 189.5, gWidth - 24, "center")
+    else
+        love.graphics.printf({tipCol, string.format("%.2f", pDisplay) .. "%"}, font[2], 10, 189.5, gWidth - 24, "center")
     end
 
     if lastTimer > 0 and not isMiss then
@@ -216,6 +224,8 @@ function failUI()
             love.graphics.printf({red, "max: " .. 1 * (0.1 * spdMax) .. "x"}, font[1], 0, 160, gWidth, "center")
         end
     end
+
+    love.graphics.printf({{0.95, 0.7, 0.6}, string.format("%.2f", pDisplay) .. "%"}, font[1], 0, 155.5, gWidth, "center")
     
     love.graphics.printf({{1, 0.5, 0.25}, "Escape", {1, 1, 1}, " to exit"}, font[2], 0, 190, gWidth, "center")
     love.graphics.printf({{0.95, 0.7, 0.2}, "R", {1, 1, 1}, " to restart"}, font[2], 0, 207, gWidth, "center")

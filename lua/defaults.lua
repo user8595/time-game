@@ -28,6 +28,7 @@ lastTimer = 0
 TimingTimer = 0
 lastTimingTimer = 0
 bpm = 60 * speed
+pDisplay = 0
 
 -- hide timing text
 isMiss = true

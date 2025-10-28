@@ -1,4 +1,6 @@
 local progX = (gWidth - 120) / 2
+local pfP, grP, gdP = 3, 2.95, 2.7
+currP, maxP = 0, 0
 
 function gameDisplay()
     love.graphics.push()
@@ -43,6 +45,8 @@ function gameKey(key)
                 good = good + 1
                 lifeBar = lifeBar + 3
                 keyInit()
+                currP = currP + gdP
+                maxP = maxP + pfP
             end
             
             if key == keys.hit and timer > 0.85 and timer < 0.95 then
@@ -50,6 +54,8 @@ function gameKey(key)
                 great = great + 1
                 lifeBar = lifeBar + 4
                 keyInit()
+                currP = currP + grP
+                maxP = maxP + pfP
             end
         
             if key == keys.hit and timer > 0.95 and timer < 1.05 then
@@ -58,6 +64,8 @@ function gameKey(key)
                 pf = pf + 1
                 lifeBar = lifeBar + 5
                 keyInit()
+                currP = currP + pfP
+                maxP = maxP + pfP
             end
         
             if key == keys.hit and timer > 1.05 and timer < 1.15 then
@@ -65,6 +73,8 @@ function gameKey(key)
                 great = great + 1
                 lifeBar = lifeBar + 4
                 keyInit()
+                currP = currP + grP
+                maxP = maxP + pfP
             end
         
             if key == keys.hit and timer > 1.15 and timer < 1.25 then
@@ -72,6 +82,8 @@ function gameKey(key)
                 good = good + 1
                 lifeBar = lifeBar + 3
                 keyInit()
+                currP = currP + gdP
+                maxP = maxP + pfP
             end
             
             if mode == 1 then
@@ -267,7 +279,11 @@ function gameLoop(dt)
         TimingTimer = TimingTimer + dt
         timer = timer + dt * speed
         buttonTime = buttonTime + dt * speed
-        
+
+        if currP > 0 then
+            pDisplay = (currP / maxP) * 100
+        end
+
         if isPF then
             animHitTime = animHitTime + dt
         end
@@ -288,11 +304,12 @@ function gameLoop(dt)
                 timer = 0
                 TimingTimer = 0
                 miss = miss + 1
-                lifeBar = lifeBar - 16
+                lifeBar = lifeBar - 18
                 seType = 0
                 isMiss = true
                 love.audio.play(se.miss)
                 isShake = true
+                maxP = maxP + pfP
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
             end
         elseif mode == 2 then
@@ -301,12 +318,13 @@ function gameLoop(dt)
                 timer = 0
                 TimingTimer = 0
                 miss = miss + 1
-                lifeBar = lifeBar - 16
+                lifeBar = lifeBar - 18
                 seType = 0
                 isMiss = true
                 speed = 1
                 love.audio.play(se.miss)
                 isShake = true
+                maxP = maxP + pfP
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
             end
         end
