@@ -30,6 +30,8 @@ lastTimingTimer = 0
 bpm = 60 * speed
 pDisplay = 0
 
+min, sec = 0, 0
+
 -- hide timing text
 isMiss = true
 animHitTime = 0

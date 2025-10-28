@@ -27,6 +27,7 @@ function gameInit()
     seType = 0
     lifeBar = 100
     currP, maxP, pDisplay = 0, 0, 0
+    min, sec = 0, 0
     isPaused = false
     isFail = false
     se.miss:setPitch(1)
@@ -102,7 +103,7 @@ function gameUI()
     end
 
     love.graphics.setColor(white)
-    love.graphics.printf({timingCol[2], "perfect " .. pf, timingCol[3], "\ngreat " .. great, timingCol[4], "\ngood " .. good, timingCol[1], "\nmiss " .. miss}, font[1], 0, 110, gWidth, "center")
+    love.graphics.printf({timingCol[2], "perfect " .. pf, timingCol[3], "\ngreat " .. great, timingCol[4], "\ngood " .. good, timingCol[1], "\nmiss " .. miss}, font[1], 0, 107, gWidth, "center")
     
     totalLife = -215
     currLife = (lifeBar / 100)
@@ -148,9 +149,9 @@ function gameUI()
 
     love.graphics.setColor(white)
     if pDisplay == 0 then
-        love.graphics.printf({tipCol, "0%"}, font[2], 10, 189.5, gWidth - 24, "center")
+        love.graphics.printf({tipCol, "0%\n" .. string.format("%02d", math.floor(min)) .. ":" .. string.format("%02d", math.floor(sec))}, font[2], 10, 181, gWidth - 24, "center")
     else
-        love.graphics.printf({tipCol, string.format("%.2f", pDisplay) .. "%"}, font[2], 10, 189.5, gWidth - 24, "center")
+        love.graphics.printf({tipCol, string.format("%.2f", pDisplay) .. "%\n" .. string.format("%02d", math.floor(min)) .. ":" .. string.format("%02d", math.floor(sec))}, font[2], 10, 181, gWidth - 24, "center")
     end
 
     if lastTimer > 0 and not isMiss then
@@ -183,6 +184,7 @@ function modeUI()
     love.graphics.setColor(1, 1, 1, 0.15)
     love.graphics.rectangle("fill", 0, selY, gWidth, 26)
     
+    --TODO: Show best score on mode menu
     love.graphics.setColor(1, 1, 1)
     if mode == 1 then
         love.graphics.printf(modeStrings[1], font[2], 0, gHeight - 70, gWidth, "center")
@@ -225,7 +227,8 @@ function failUI()
         end
     end
 
-    love.graphics.printf({{0.95, 0.7, 0.6}, string.format("%.2f", pDisplay) .. "%"}, font[1], 0, 155.5, gWidth, "center")
+    --TODO: Change color on high score
+    love.graphics.printf({{0.95, 0.7, 0.6}, string.format("%.2f", pDisplay) .. "%\n" .. string.format("%02d", math.floor(min)) .. ":" .. string.format("%02d", math.floor(sec))}, font[1], 0, 148, gWidth, "center")
     
     love.graphics.printf({{1, 0.5, 0.25}, "Escape", {1, 1, 1}, " to exit"}, font[2], 0, 190, gWidth, "center")
     love.graphics.printf({{0.95, 0.7, 0.2}, "R", {1, 1, 1}, " to restart"}, font[2], 0, 207, gWidth, "center")

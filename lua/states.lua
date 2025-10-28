@@ -1,5 +1,5 @@
 local progX = (gWidth - 120) / 2
-local pfP, grP, gdP = 3, 2.95, 2.7
+local pfP, grP, gdP = 2, 1.95, 1.7
 currP, maxP = 0, 0
 
 function gameDisplay()
@@ -279,6 +279,11 @@ function gameLoop(dt)
         TimingTimer = TimingTimer + dt
         timer = timer + dt * speed
         buttonTime = buttonTime + dt * speed
+        sec = sec + dt
+        if sec > 59 then
+            sec = 0
+            min = min + 1
+        end
 
         if currP > 0 then
             pDisplay = (currP / maxP) * 100
