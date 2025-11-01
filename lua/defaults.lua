@@ -1,5 +1,5 @@
 wWidth, wHeight = love.graphics.getWidth(), love.graphics.getHeight()
-gWidth, gHeight = 220, 280
+gWidth, gHeight = 330, 280
 tX, tY = (wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23
 ver = "v1.0"
 
@@ -15,10 +15,11 @@ countdownCool = 0
 isFail = false
 isDebug = false
 isShake = false
+showHit = true
 shakeTime = 0
 isExit = 0 -- -1 = mode & popups, 0 = game, 1 = exit game
 
-state = "title"
+state = "title" -- "title", "mode", "game", "options", "about"
 mode = 1 -- 1 = normal, 2 = random
 buttonTime = 0
 speed = 1
@@ -31,6 +32,10 @@ bpm = 60 * speed
 pDisplay = 0
 
 min, sec = 0, 0
+
+--TODO: Finish button skin function
+buttonSkin = 1
+redbutton = false
 
 -- hide timing text
 isMiss = true
@@ -51,11 +56,14 @@ keys = {
     hit = "space",
 }
 
+-- judgement effect variables
+eX, eY, eW, eH, eT = gWidth / 2 - 29, 6, 48, 48, 0
+
 -- timing effect object
 timingEffect, pfEffect, msEffect = {}, {}, {}
 
 buttonCol, textCol = {1, 1, 1, 0}, {0, 0, 0, 0}
-buttonRed = {1, 0.5, 0.5, 0}
+buttonRed = {1, 0.25, 0.25, 0}
 
 timingCol = {
     {1, 0.25, 0.25, 1},

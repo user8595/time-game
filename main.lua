@@ -4,6 +4,7 @@ require("lua.game")
 
 function love.load()
     love.graphics.setBackgroundColor(0.03, 0.03, 0.03)
+    love.graphics.setDefaultFilter("nearest", "nearest")
     -- game audio
     se = {
         miss = love.audio.newSource("/assets/se/miss.wav", "static"),
@@ -20,6 +21,10 @@ end
 
 function love.update(dt)
     gameLoop(dt)
+end
+
+function love.resize(w, h)
+    wWidth, wHeight = w, h
 end
 
 function love.draw()

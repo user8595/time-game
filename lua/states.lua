@@ -1,5 +1,5 @@
 local progX = (gWidth - 120) / 2
-local pfP, grP, gdP = 2, 1.95, 1.7
+local pfP, grP, gdP = 2, 1.95, 1.5
 currP, maxP = 0, 0
 
 function gameDisplay()
@@ -21,27 +21,51 @@ function gameDisplay()
     if state == "mode" then
         modeUI()
     end
-    if isFail then
-        failUI()
-    end
     if isCountdown then
         countdownUI()
     end
     love.graphics.pop()
+
+    if mode ~= 2 then
+        love.graphics.push()
+        love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 18)
+            if isFail then
+                failUI()
+            end
+        love.graphics.pop()
+    else
+        love.graphics.push()
+        love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 10)
+            if isFail then
+                failUI()
+            end
+        love.graphics.pop()
+    end
     
+    love.graphics.push()
+    love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2)
     if isPaused then
         pauseUI()
     end
+    love.graphics.pop()
     if isDebug then
         debugUI()
     end
 end
 
 function gameKey(key)
+    if key == "f11" then
+        if not love.window.getFullscreen() then
+            love.window.setFullscreen(true)
+        else
+            love.window.setFullscreen(false)
+        end
+    end
+
     if state == "game" then
         if not isPaused and not isFail and not isCountdown then
             if key == keys.hit and timer > 0.75 and timer < 0.85 then
-                table.insert(timingEffect, {{0.25, 0.5, 1, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
+                table.insert(timingEffect, {{0.25, 0.5, 1, 1}, eX, eY, eW, eH, eT})
                 good = good + 1
                 lifeBar = lifeBar + 3
                 keyInit()
@@ -50,7 +74,7 @@ function gameKey(key)
             end
             
             if key == keys.hit and timer > 0.85 and timer < 0.95 then
-                table.insert(timingEffect, {{1, 0.5, 0.25, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
+                table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
                 great = great + 1
                 lifeBar = lifeBar + 4
                 keyInit()
@@ -59,7 +83,7 @@ function gameKey(key)
             end
         
             if key == keys.hit and timer > 0.95 and timer < 1.05 then
-                table.insert(timingEffect, {{0.5, 1, 1, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
+                table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
                 table.insert(pfEffect, {{0.5, 1, 1, 1}, progX + 88, 58, 13, 18, 0})
                 pf = pf + 1
                 lifeBar = lifeBar + 5
@@ -69,7 +93,7 @@ function gameKey(key)
             end
         
             if key == keys.hit and timer > 1.05 and timer < 1.15 then
-                table.insert(timingEffect, {{1, 0.5, 0.25, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
+                table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
                 great = great + 1
                 lifeBar = lifeBar + 4
                 keyInit()
@@ -78,7 +102,7 @@ function gameKey(key)
             end
         
             if key == keys.hit and timer > 1.15 and timer < 1.25 then
-                table.insert(timingEffect, {{0.25, 0.5, 1, 1}, gWidth / 2 - 29, 6, 48, 48, 0})
+                table.insert(timingEffect, {{0.25, 0.5, 1, 1}, eX, eY, eW, eH, eT})
                 good = good + 1
                 lifeBar = lifeBar + 3
                 keyInit()
@@ -111,7 +135,7 @@ function gameKey(key)
             end
         end
         
-        
+        --TODO: Add pause cooldown
         if key == "p" and not isFail and not isCountdown then
             if not isPaused then
                 isPaused = true
@@ -129,11 +153,13 @@ function gameKey(key)
             love.audio.play(se.sel_2)
         end
 
-        if key == keys.hit or key == "return" then
-            state = "game"
-            isCountdown = true
-            isExit = -1
-            love.audio.play(se.sel_2)
+        if mode == 1 or mode == 2 then
+            if key == keys.hit or key == "return" then
+                state = "game"
+                isCountdown = true
+                isExit = -1
+                love.audio.play(se.sel_2)
+            end
         end
 
         if key == "up" then
@@ -173,6 +199,7 @@ function gameKey(key)
     if isPaused then
         if key == "r" then
             gameInit()
+            isCountdown = true
             love.audio.play(se.sel_2)
         end
     end
@@ -216,6 +243,9 @@ end
 
 function gameLoop(dt)
     bpm = 60 * speed
+    if state == "title" or state == "mode" then
+        se.sel_2:setPitch(1.25)
+    end
 
     if isShake then
         shakeTime = shakeTime + dt
@@ -237,13 +267,17 @@ function gameLoop(dt)
     end
 
     if mode < 1 then
-        mode = 2
-        selY = 90
+        mode = 4
+        selY = 90 + 26 * 2
     end
 
-    if mode > 2 then
+    if mode > 4 then
         mode = 1
         selY = 64
+    end
+
+    if mode == 2 then
+        fTextY = 205
     end
 
     if spdMax > 40 then
@@ -259,12 +293,12 @@ function gameLoop(dt)
     end
 
     if countdownCool > 0 and countdownCool < 0.025 then
-        se.sel_2:setPitch(1)
+        se.sel_2:setPitch(1.25)
         love.audio.play(se.sel_2)
     end
-    
+
     if countdownCool > 1 and countdownCool < 1.025 then
-        se.sel_2:setPitch(0.75)
+        se.sel_2:setPitch(1)
         love.audio.play(se.sel_2)
     end
 
@@ -336,9 +370,9 @@ function gameLoop(dt)
         
 
         if buttonTime < 1 then
-            buttonCol[4] = buttonCol[4] + dt
-            buttonRed[4] = buttonRed[4] + dt
-            textCol[4] = textCol[4] + dt
+            buttonCol[4] = buttonCol[4] + dt * speed
+            buttonRed[4] = buttonRed[4] + dt * speed
+            textCol[4] = textCol[4] + dt * speed
         end
         
         if buttonTime > 1 and timer < 1 then
