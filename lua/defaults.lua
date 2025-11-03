@@ -5,7 +5,7 @@ ver = "v1.0"
 
 font = {
     love.graphics.newFont("/assets/fonts/monogram.ttf", 22),
-    love.graphics.newFont("/assets/fonts/picopixel.ttf", 14),
+    love.graphics.newFont("/assets/fonts/Picopixel.ttf", 14),
     love.graphics.newFont("/assets/fonts/monogram.ttf", 26),
 }
 

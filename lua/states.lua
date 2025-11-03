@@ -390,7 +390,7 @@ function gameLoop(dt)
 
     -- red tint on low health
     if not isFail then
-        if lifeBar < 15 and redTint[4] < 0.05 then
+        if lifeBar <= 15 and redTint[4] < 0.05 then
             redTint[4] = redTint[4] + dt * 0.2
         elseif lifeBar > 15 and redTint[4] > 0 then
             redTint[4] = redTint[4] - dt * 0.1
