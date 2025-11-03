@@ -1,15 +1,23 @@
 local tableClear = require("table.clear")
 local progX = (gWidth - 120) / 2
 local judgeY = 132
+
 local modeStrings = {
     "Play endlessly.",
     "Play while the game's speed\nchanges every hit.",
     "Game configuration.",
     "About game."
 }
+local optStrings = {
+    "Enable sound effects.",
+    "Change button skin.",
+    "Enable screen shake effect."
+}
+
 local totalLife = -215
 local currLife = (lifeBar / 100)
 local buttonYOff = 55
+
 fTextY = 190
 seType = 0
 
@@ -21,6 +29,7 @@ function gameInit()
     buttonCol[4] = 0
     buttonRed[4] = 0
     textCol[4] = 0
+    redTint[4] = 0
     tCol = timingCol[1]
     isMiss = true
     tableClear(timingEffect)
@@ -62,11 +71,47 @@ function keyInit()
     if mode == 2 then
         speed = 1 * (0.1 * love.math.random(10, spdMax))
     end
+
+    if shakeEnabled then
+        if speed > 3.5 then
+            isShakeHit = true
+        end
+    end
 end
 
 function gameOverlay()
     love.graphics.setColor(0, 0, 0, 0.85)
     love.graphics.rectangle("fill", 0, 0, wWidth, wHeight)
+end
+
+function lowHealthOverlay()
+    love.graphics.setColor(redTint)
+    love.graphics.rectangle("fill", 0, 0, wWidth, wHeight)
+end
+
+local pauseW, pauseTime, textColVal = 240, 0, 0.15
+function pauseDelay()
+    love.graphics.setColor({1, 1, 1})
+    love.graphics.rectangle("fill", 40, gHeight / 2 - 29, pauseW * pauseTime, 12)
+    love.graphics.setColor({1, 1, 1, 0.25})
+    love.graphics.rectangle("line", 40, gHeight / 2 - 29, pauseW, 12)
+    love.graphics.setColor({1, 1, 1, textColVal})
+    love.graphics.printf(".....", font[1], 0, gHeight / 2 + 30, gWidth, "center")
+end
+
+function pauseDelayFunc(dt)
+    if isPauseDelay then
+        pauseTime = pauseTime + dt
+        if textColVal < 1 then
+            textColVal = textColVal + (pauseTime * 0.045)
+        end
+    end
+    if pauseTime > 1 then
+        isPauseDelay = false
+        isPaused = false
+        pauseTime = 0
+        textColVal = 0.15
+    end
 end
 
 function gameUI()
@@ -76,25 +121,35 @@ function gameUI()
     end
     
     if timer > 1 then
-        love.graphics.setColor({1, 0.75, 0.45, 0.75})
+        if buttonSkin == 1 then
+            love.graphics.setColor({1, 0.75, 0.45, 0.75})
+        elseif buttonSkin == 2 then
+            love.graphics.setColor({1, 0.75, 0.45, 0.5})
+        end
         love.graphics.rectangle("fill", gWidth / 2 - 25 - 5, 5 + buttonYOff, 50, 50)
     end
 
-    if mode == 2 then
-        if speed < 3 then
-            love.graphics.setColor(buttonCol)
+    if buttonSkin == 1 then
+        if mode == 2 then
+            if speed < 3 then
+                love.graphics.setColor(buttonCol)
+            else
+                love.graphics.setColor(buttonRed)
+            end
         else
-            love.graphics.setColor(buttonRed)
+            love.graphics.setColor(buttonCol)
         end
-    else
-        love.graphics.setColor(buttonCol)
-    end
-    
-    --TODO: Add button skins
-    love.graphics.rectangle("fill", gWidth / 2 - 25, 10 + buttonYOff, 40, 40)
-    if showHit then
+        love.graphics.rectangle("fill", gWidth / 2 - 25, 10 + buttonYOff, 40, 40)
         love.graphics.setColor(textCol)
         love.graphics.printf("HIT!", font[2], 0, 25 + buttonYOff, gWidth - 6, "center")
+    elseif buttonSkin == 2 then
+        love.graphics.setColor(1, 0.7, 0.5, 0.65)
+        love.graphics.rectangle("line", gWidth / 2 - 25, 10 + buttonYOff, 40, 40)
+        if state ~= "game" or isCountdown then
+        else
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.draw(tex.button_2, gWidth / 2 - 25 + 20, 10 + buttonYOff + 20, 0, b2S, b2S, tex.button_2:getWidth() / 2, tex.button_2:getHeight() / 2)
+        end
     end
 
     love.graphics.setColor(tCol)
@@ -191,6 +246,7 @@ function titleUI()
     love.graphics.print(ver, font[2], 10, gHeight - 44)
 end
 
+--TODO: Add mouse function
 function modeUI()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf("select mode", font[3], 0, 16, gWidth, "center")
@@ -206,21 +262,23 @@ function modeUI()
     love.graphics.setColor(1, 1, 1)
     if mode == 1 then
         love.graphics.printf(modeStrings[1], font[2], 0, gHeight - 70, gWidth, "center")
+        love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.normal}, font[2], 0, gHeight - 90, gWidth, "center")
     elseif mode == 2 then
         love.graphics.printf(modeStrings[2], font[2], 0, gHeight - 70, gWidth, "center")
+        love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.random}, font[2], 0, gHeight - 90, gWidth - 110, "center")
         if spdMax < 30 then
             if spdMax == 10 then
-                love.graphics.printf({red, "max ", white, 1 * (0.1 * spdMax) .. "x >"}, font[2], 0, gHeight - 90, gWidth, "center")
-            elseif spdMax == 40 then
-                love.graphics.printf({white, "< ", red, "max ", white, 1 * (0.1 * spdMax) .. "x"}, font[2], 0, gHeight - 90, gWidth, "center")
+                love.graphics.printf({red, "max ", white, 1 * (0.1 * spdMax) .. "x >"}, font[2], 0, gHeight - 90, gWidth + 110, "center")
+            elseif spdMax == 50 then
+                love.graphics.printf({white, "< ", red, "max ", white, 1 * (0.1 * spdMax) .. "x"}, font[2], 0, gHeight - 90, gWidth + 110, "center")
             else
-                love.graphics.printf({white, "< ", red, "max ", white, 1 * (0.1 * spdMax) .. "x >"}, font[2], 0, gHeight - 90, gWidth, "center")
+                love.graphics.printf({white, "< ", red, "max ", white, 1 * (0.1 * spdMax) .. "x >"}, font[2], 0, gHeight - 90, gWidth + 110, "center")
             end
         else
-            if spdMax == 40 then
-                love.graphics.printf({white, "< ", red, "max ", 1 * (0.1 * spdMax) .. "x"}, font[2], 0, gHeight - 90, gWidth, "center")
+            if spdMax == 50 then
+                love.graphics.printf({white, "< ", red, "max ", 1 * (0.1 * spdMax) .. "x"}, font[2], 0, gHeight - 90, gWidth + 110, "center")
             else
-                love.graphics.printf({white, "< ", red, "max ", 1 * (0.1 * spdMax) .. "x", white, " >"}, font[2], 0, gHeight - 90, gWidth, "center")
+                love.graphics.printf({white, "< ", red, "max ", 1 * (0.1 * spdMax) .. "x", white, " >"}, font[2], 0, gHeight - 90, gWidth + 110, "center")
             end
         end
     elseif mode == 3 then
@@ -231,11 +289,55 @@ function modeUI()
 end
 
 function optionsUI()
-    --TODO: Finish option menu
+    love.graphics.setColor({1, 1, 1})
+    love.graphics.printf("options", font[3], 0, 16, gWidth, "center")
+    
+    love.graphics.printf("sound", font[3], 40, 64, gWidth - 40, "left")
+    if isAudio then
+        love.graphics.printf("on", font[3], gWidth - 100, 64, 100, "center")
+    else
+        love.graphics.printf("off", font[3], gWidth - 100, 64, 100, "center")
+    end
+
+    love.graphics.printf("skin", font[3], 40, 64 + 26, gWidth - 40, "left")
+    love.graphics.printf(buttonSkin, font[3], 40, 64 + 26, gWidth - 85, "right")
+
+    love.graphics.printf("screenshake", font[3], 40, 64 + 26 * 2, gWidth - 40, "left")
+    if shakeEnabled then
+        love.graphics.printf("on", font[3], gWidth - 100, 64 + 26 * 2, 100, "center")
+    else
+        love.graphics.printf("off", font[3], gWidth - 100, 64 + 26 * 2, 100, "center")
+    end
+
+    love.graphics.printf("back", font[3], 0, 64 + 26 * 3 + 16, gWidth, "center")
+
+    love.graphics.setColor(1, 1, 1, 0.15)
+    love.graphics.rectangle("fill", 0, selYOpt, gWidth, 26)
+    love.graphics.setColor(1, 1, 1)
+    if optSel < 4 then
+        love.graphics.printf("<    >", font[3], 40, selYOpt, gWidth - 60, "right")
+    end
+
+    love.graphics.setColor(1, 1, 1)
+    if optSel == 1 then
+        love.graphics.printf(optStrings[1], font[2], 0, gHeight - 70, gWidth, "center")
+    elseif optSel == 2 then
+        love.graphics.printf(optStrings[2], font[2], 0, gHeight - 70, gWidth, "center")
+    elseif optSel == 3 then
+        love.graphics.printf(optStrings[3], font[2], 0, gHeight - 70, gWidth, "center")
+    end
 end
 
 function aboutUI()
-    --TODO: Finish About menu
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.draw(tex.logo, gWidth / 2 - 30, gHeight / 2 - 54, 0, 0.23, 0.23)
+    love.graphics.printf("time\n", font[3], 0, gHeight / 2 - 124, gWidth, "center")
+    love.graphics.printf({{0.5, 0.5, 0.5}, "simple one keyed\ntiming game\n\n\n\n\n\n© 2025 eightyfivenine\nlicensed under the MIT license."}, font[1], 0, gHeight / 2 - 105, gWidth, "center")
+    
+    love.graphics.setColor(1, 1, 1, 0.15)
+    love.graphics.rectangle("fill", 0, 90 + 26 * 4.25, gWidth, 26)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.printf("back", font[3], 0, 90 + 26 * 4.25, gWidth, "center")
 end
 
 function pauseUI()

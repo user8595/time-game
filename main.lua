@@ -1,10 +1,17 @@
-require("lua.defaults")
-require("lua.states")
-require("lua.game")
-
 function love.load()
     love.graphics.setBackgroundColor(0.03, 0.03, 0.03)
     love.graphics.setDefaultFilter("nearest", "nearest")
+    
+    require("lua.defaults")
+    require("lua.states")
+    require("lua.save")
+    require("lua.game")
+    
+    newSave("options.json", {audio = true, skin = 1, shakeEnabled = true})
+    newSave("score.json", {normal = 0, random = 0})
+    loadOptions()
+    loadScore()
+    
     -- game audio
     se = {
         miss = love.audio.newSource("/assets/se/miss.wav", "static"),
@@ -12,6 +19,11 @@ function love.load()
         hit_2 = love.audio.newSource("/assets/se/hit_2.wav", "static"),
         sel_1 = love.audio.newSource("/assets/se/sel_1.wav", "static"),
         sel_2 = love.audio.newSource("/assets/se/sel_2.wav", "static"),
+    }
+    -- textures
+    tex = {
+        logo = love.graphics.newImage("/assets/icon.png"),
+        button_2 = love.graphics.newImage("/assets/tex/button_2.png")
     }
 end
 

@@ -3,16 +3,23 @@ local pfP, grP, gdP = 2, 1.95, 1.5
 currP, maxP = 0, 0
 
 function gameDisplay()
+    -- game
     love.graphics.push()
     love.graphics.translate(tX, tY)
     gameUI()
     love.graphics.pop()
     
-    if state == "title" or state == "mode" or isPaused or isFail or isCountdown then
+    -- background
+    if isPaused or isFail or isCountdown or state ~= "game" then
         gameOverlay()
     else
     end
+
+    if state == "game" then
+        lowHealthOverlay()
+    end
     
+    -- menu & title
     love.graphics.push()
     love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23)
     if state == "title" then
@@ -21,11 +28,21 @@ function gameDisplay()
     if state == "mode" then
         modeUI()
     end
+    if state == "options" then
+        optionsUI()
+    end
+    if state == "about" then
+        aboutUI()
+    end
     if isCountdown then
         countdownUI()
     end
+    if isPauseDelay then
+        pauseDelay()
+    end
     love.graphics.pop()
 
+    -- fail screen
     if mode ~= 2 then
         love.graphics.push()
         love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 18)
@@ -42,12 +59,14 @@ function gameDisplay()
         love.graphics.pop()
     end
     
+    -- pause screen
     love.graphics.push()
     love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2)
-    if isPaused then
+    if isPaused and not isPauseDelay then
         pauseUI()
     end
     love.graphics.pop()
+
     if isDebug then
         debugUI()
     end
@@ -111,7 +130,7 @@ function gameKey(key)
             end
             
             if mode == 1 then
-                if key == "up" and speed < 4 then
+                if key == "up" and speed < 5 then
                     speed = speed + .05
                     buttonTime = 0
                     timer = 0
@@ -135,19 +154,18 @@ function gameKey(key)
             end
         end
         
-        --TODO: Add pause cooldown
-        if key == "p" and not isFail and not isCountdown then
+        if key == "p" and not isFail and not isCountdown and not isPauseDelay then
             if not isPaused then
                 isPaused = true
                 love.audio.play(se.sel_1)
             else
-                isPaused = false
+                isPauseDelay = true
                 love.audio.play(se.sel_1)
             end
         end
     end
 
-    if state == "mode" then
+    if state == "mode" and state ~= "about" then
         if key == "escape" then
             state = "title"
             love.audio.play(se.sel_2)
@@ -158,6 +176,22 @@ function gameKey(key)
                 state = "game"
                 isCountdown = true
                 isExit = -1
+                love.audio.play(se.sel_2)
+            end
+        end
+
+        if mode == 3 then
+            if key == keys.hit or key == "return" then
+                optSel = 1
+                state = "options"
+                love.audio.play(se.sel_2)
+            end
+        end
+
+        if mode == 4 then
+            if key == keys.hit or key == "return" then
+                state = "about"
+                backState = 0
                 love.audio.play(se.sel_2)
             end
         end
@@ -183,6 +217,84 @@ function gameKey(key)
                 spdMax = spdMax + 1
                 love.audio.play(se.sel_1)
             end
+        end
+    end
+
+    if state == "options" then
+        if key == "up" and optSel == 4 then
+            selYOpt = selYOpt - 26 + 10
+            love.audio.play(se.sel_1)
+        end
+
+        if key == "down" and optSel == 3 then
+            selYOpt = selYOpt + 26 - 10
+            love.audio.play(se.sel_1)
+        end
+
+        if key == "up" then
+            optSel = optSel - 1
+            selYOpt = selYOpt - 26
+            love.audio.play(se.sel_1)
+        end
+
+        if key == "down" then
+            optSel = optSel + 1
+            selYOpt = selYOpt + 26
+            love.audio.play(se.sel_1)
+        end
+        
+        if optSel == 1 then
+            if key == "left" or key == "right" then
+                if isAudio then
+                    isAudio = false
+                else
+                    isAudio = true
+                end
+                love.audio.play(se.sel_2)
+            end
+        end
+
+        if optSel == 2 then
+            if key == "left" then
+                buttonSkin = buttonSkin - 1
+                love.audio.play(se.sel_2)
+            end
+            if key == "right" then
+                buttonSkin = buttonSkin + 1
+                love.audio.play(se.sel_2)
+            end
+        end
+
+        if optSel == 3 then
+            if key == "left" or key == "right" then
+                if shakeEnabled then
+                    shakeEnabled = false
+                else
+                    shakeEnabled = true
+                end
+                love.audio.play(se.sel_2)
+            end
+        end
+
+        if optSel == 4 then
+            if key == keys.hit or key == "return" then
+                state = "mode"
+                optSel = 1
+                selYOpt = 64
+                if isAudio ~= decO.audio or buttonSkin ~= decO.skin or shakeEnabled ~= decO.shakeEnabled then
+                    saveData("options.json", {audio = isAudio, skin = buttonSkin, shakeEnabled = shakeEnabled})
+                end
+                love.audio.play(se.sel_2)
+            end
+        end
+    end
+
+    if state == "about" then
+        if key == keys.hit and backState < 1 or key == "return" and backState < 1 then
+            backState = backState + 1
+        elseif key == keys.hit or key == "return" then
+            state = "mode"
+            love.audio.play(se.sel_2)
         end
     end
 
@@ -242,12 +354,68 @@ function gameKey(key)
 end
 
 function gameLoop(dt)
+    if not isAudio then
+        love.audio.setVolume(0)
+    else
+        love.audio.setVolume(1)
+    end
+
+    if state == "options" then
+        if optSel < 1 then
+            optSel = 4
+            selYOpt = 64 + 26 * 3 + 16
+        end
+        
+        if optSel > 4 then
+            optSel = 1
+            selYOpt = 64
+        end
+    end
+
+    if buttonSkin < 1 then
+        buttonSkin = 2
+    end
+    
+    if buttonSkin > 2 then
+        buttonSkin = 1
+    end
+
     bpm = 60 * speed
+
     if state == "title" or state == "mode" then
         se.sel_2:setPitch(1.25)
     end
+    
+    pauseDelayFunc(dt)
 
-    if isShake then
+    -- red tint on low health
+    if not isFail then
+        if lifeBar < 15 and redTint[4] < 0.05 then
+            redTint[4] = redTint[4] + dt * 0.2
+        elseif lifeBar > 15 and redTint[4] > 0 then
+            redTint[4] = redTint[4] - dt * 0.1
+        end
+    end
+
+    if isFail then
+        redTint[4] = 0.02
+        -- save score
+        if mode == 1 then
+            if pf > hiPerf.normal then
+                saveData("score.json", {normal = pf, random = hiPerf.random})
+            end
+            loadScore()
+        end
+
+        if mode == 2 then
+            if pf > hiPerf.random then
+                saveData("score.json", {normal = hiPerf.normal, random = pf})
+            end
+            loadScore()
+        end
+    end
+
+    if isShake or isShakeHit then
         shakeTime = shakeTime + dt
     else
         tX, tY = (wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23
@@ -256,10 +424,27 @@ function gameLoop(dt)
     if shakeTime > 0 and isShake then
         tX, tY = (wWidth - gWidth) / 2 + love.math.random(2.25, -2.25), (wHeight - gHeight) / 2 + 23 + love.math.random(2.25, -2.25)
     end
+    
+    if shakeTime > 0 and isShakeHit and speed > 3.5 then
+        tX, tY = (wWidth - gWidth) / 2 + love.math.random(1.25, -1.25), (wHeight - gHeight) / 2 + 23 + love.math.random(1.25, -1.25)
+    end
 
+    if shakeTime > 0 and isShakeHit and speed > 4.25 then
+        tX, tY = (wWidth - gWidth) / 2 + love.math.random(1.65, -1.65), (wHeight - gHeight) / 2 + 23 + love.math.random(1.65, -1.65)
+    end
+
+    if shakeTime > 0 and isShakeHit and speed > 4.5 then
+        tX, tY = (wWidth - gWidth) / 2 + love.math.random(2, -2), (wHeight - gHeight) / 2 + 23 + love.math.random(2, -2)
+    end
+    
     if shakeTime > 0.05 and isShake then
         shakeTime = 0
         isShake = false
+    end
+
+    if shakeTime > 0.05 and isShakeHit then
+        shakeTime = 0
+        isShakeHit = false
     end
 
     if isExit == 1 then
@@ -280,8 +465,8 @@ function gameLoop(dt)
         fTextY = 205
     end
 
-    if spdMax > 40 then
-        spdMax = 40
+    if spdMax > 50 then
+        spdMax = 50
     end
 
     if spdMax < 10 then
@@ -312,6 +497,7 @@ function gameLoop(dt)
         pW = width * (timer / 1.25)
         TimingTimer = TimingTimer + dt
         timer = timer + dt * speed
+        b2S = (timer * 2.5)
         buttonTime = buttonTime + dt * speed
         sec = sec + dt
         if sec > 59 then
@@ -343,12 +529,14 @@ function gameLoop(dt)
                 timer = 0
                 TimingTimer = 0
                 miss = miss + 1
-                lifeBar = lifeBar - 18
+                lifeBar = lifeBar - 16
                 seType = 0
                 isMiss = true
                 love.audio.play(se.miss)
-                isShake = true
-                maxP = maxP + pfP
+                if shakeEnabled then
+                    isShake = true
+                end
+                    maxP = maxP + pfP
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
             end
         elseif mode == 2 then
@@ -357,18 +545,19 @@ function gameLoop(dt)
                 timer = 0
                 TimingTimer = 0
                 miss = miss + 1
-                lifeBar = lifeBar - 18
+                lifeBar = lifeBar - 16
                 seType = 0
                 isMiss = true
                 speed = 1
                 love.audio.play(se.miss)
-                isShake = true
+                if shakeEnabled then
+                    isShake = true
+                end
                 maxP = maxP + pfP
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
             end
         end
         
-
         if buttonTime < 1 then
             buttonCol[4] = buttonCol[4] + dt * speed
             buttonRed[4] = buttonRed[4] + dt * speed
@@ -385,8 +574,8 @@ function gameLoop(dt)
         if speed < 0.1 then
             speed = 0.1
         end
-        if speed > 4 then
-            speed = 4
+        if speed > 5 then
+            speed = 5
         end
         
         if animHitTime > 0 and animHitTime < 0.1 then

@@ -10,17 +10,19 @@ font = {
 }
 
 isPaused = false
+isPauseDelay = false
 isCountdown = false
 countdownCool = 0
 isFail = false
 isDebug = false
 isShake = false
-showHit = true
+isShakeHit = false
 shakeTime = 0
 isExit = 0 -- -1 = mode & popups, 0 = game, 1 = exit game
+backState = 0 -- 0 = initial, 1 = closed from state (permanent)
 
 state = "title" -- "title", "mode", "game", "options", "about"
-mode = 1 -- 1 = normal, 2 = random
+mode = 1 -- 1 = normal, 2 = random, 3 = options, 4 = about
 buttonTime = 0
 speed = 1
 spdMax = 25
@@ -35,7 +37,9 @@ min, sec = 0, 0
 
 --TODO: Finish button skin function
 buttonSkin = 1
-redbutton = false
+shakeEnabled = true
+
+b2S = 2.5
 
 -- hide timing text
 isMiss = true
@@ -43,6 +47,13 @@ animHitTime = 0
 
 -- mode select position
 selY = 64
+
+-- option selection
+optSel = 1
+selYOpt = 64
+optionsSave = {}
+
+isAudio = true
 
 width = 120
 pW = width * (timer / 1.25)
@@ -76,5 +87,6 @@ timingCol = {
 tipCol = {0.95, 0.7, 0.6}
 white = {1, 1, 1, 1}
 red = {1, 0.25, 0.25, 1}
+redTint = {1, 0, 0, 0}
 
 tCol = timingCol[1]

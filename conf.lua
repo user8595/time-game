@@ -1,5 +1,5 @@
 function love.conf(t)
-    t.identity = "time"
+    t.identity = "time-game"
     t.window.title = "time"
     t.window.icon = "/assets/icon.png"
     t.window.width = 330
