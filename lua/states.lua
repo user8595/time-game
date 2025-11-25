@@ -45,7 +45,7 @@ function gameDisplay()
     -- fail screen
     if mode ~= 2 then
         love.graphics.push()
-        love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 18)
+        love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 8)
             if isFail then
                 failUI()
             end
@@ -73,6 +73,7 @@ function gameDisplay()
 end
 
 function gameKey(key)
+    --TODO: Add scaling in fullscreen mode
     if key == "f11" then
         if not love.window.getFullscreen() then
             love.window.setFullscreen(true)
@@ -83,55 +84,63 @@ function gameKey(key)
 
     if state == "game" then
         if not isPaused and not isFail and not isCountdown then
-            if key == keys.hit and timer > 0.75 and timer < 0.85 then
-                table.insert(timingEffect, {{0.25, 0.5, 1, 1}, eX, eY, eW, eH, eT})
-                good = good + 1
-                lifeBar = lifeBar + 3
-                keyInit()
-                currP = currP + gdP
-                maxP = maxP + pfP
+            if not love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
+                if key == keys.hit and timer > 0.75 and timer < 0.85 then
+                    table.insert(timingEffect, {{0.25, 0.5, 1, 1}, eX, eY, eW, eH, eT})
+                    good = good + 1
+                    lifeBar = lifeBar + 3
+                    keyInit()
+                    currP = currP + gdP
+                    maxP = maxP + pfP
+                end
+                
+                if key == keys.hit and timer > 0.85 and timer < 0.95 then
+                    table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
+                    great = great + 1
+                    lifeBar = lifeBar + 4
+                    keyInit()
+                    currP = currP + grP
+                    maxP = maxP + pfP
+                end
+            
+                if key == keys.hit and timer > 0.95 and timer < 1.05 then
+                    table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
+                    table.insert(pfEffect, {{0.5, 1, 1, 1}, progX + 88, 58, 13, 18, 0})
+                    pf = pf + 1
+                    lifeBar = lifeBar + 5
+                    keyInit()
+                    currP = currP + pfP
+                    maxP = maxP + pfP
+                end
+                
+                if key == keys.hit and timer > 1.05 and timer < 1.15 then
+                    table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
+                    great = great + 1
+                    lifeBar = lifeBar + 4
+                    keyInit()
+                    currP = currP + grP
+                    maxP = maxP + pfP
+                end
+            
+                if key == keys.hit and timer > 1.15 and timer < 1.25 then
+                    table.insert(timingEffect, {{0.25, 0.5, 1, 1}, eX, eY, eW, eH, eT})
+                    good = good + 1
+                    lifeBar = lifeBar + 3
+                    keyInit()
+                    currP = currP + gdP
+                    maxP = maxP + pfP
+                end
             end
             
-            if key == keys.hit and timer > 0.85 and timer < 0.95 then
-                table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
-                great = great + 1
-                lifeBar = lifeBar + 4
-                keyInit()
-                currP = currP + grP
-                maxP = maxP + pfP
-            end
-        
-            if key == keys.hit and timer > 0.95 and timer < 1.05 then
-                table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
-                table.insert(pfEffect, {{0.5, 1, 1, 1}, progX + 88, 58, 13, 18, 0})
-                pf = pf + 1
-                lifeBar = lifeBar + 5
-                keyInit()
-                currP = currP + pfP
-                maxP = maxP + pfP
-            end
-        
-            if key == keys.hit and timer > 1.05 and timer < 1.15 then
-                table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
-                great = great + 1
-                lifeBar = lifeBar + 4
-                keyInit()
-                currP = currP + grP
-                maxP = maxP + pfP
-            end
-        
-            if key == keys.hit and timer > 1.15 and timer < 1.25 then
-                table.insert(timingEffect, {{0.25, 0.5, 1, 1}, eX, eY, eW, eH, eT})
-                good = good + 1
-                lifeBar = lifeBar + 3
-                keyInit()
-                currP = currP + gdP
-                maxP = maxP + pfP
-            end
-            
-            if mode == 1 then
-                if key == "up" and speed < 5 then
+        if mode == 1 then
+            if key == "up" and speed < 5 then
+                if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
+                    love.keyboard.setKeyRepeat(true)
+                    speed = speed + .25
+                else
+                    love.keyboard.setKeyRepeat(false)
                     speed = speed + .05
+                end
                     buttonTime = 0
                     timer = 0
                     lastTimer = 0
@@ -140,7 +149,7 @@ function gameKey(key)
                     textCol[4] = 0
                     love.audio.play(se.sel_1)
                 end
-                
+                    
                 if key == "down" and speed > 0.1 then
                     speed = speed - .05
                     buttonTime = 0
@@ -153,14 +162,18 @@ function gameKey(key)
                 end
             end
         end
-        
-        if key == "p" and not isFail and not isCountdown and not isPauseDelay then
-            if not isPaused then
-                isPaused = true
-                love.audio.play(se.sel_1)
-            else
-                isPauseDelay = true
-                love.audio.play(se.sel_1)
+
+        if not isFail and not isCountdown and not isPauseDelay then
+            if key == "p" or key == "escape" then
+                if not isPaused then
+                    isPaused = true
+                    love.audio.play(se.sel_1)
+                else
+                    overSel = 1
+                    oYSel = 162
+                    isPauseDelay = true
+                    love.audio.play(se.sel_1)
+                end
             end
         end
     end
@@ -178,6 +191,12 @@ function gameKey(key)
                 isExit = -1
                 love.audio.play(se.sel_2)
             end
+        end
+
+        if mode == 2 and state ~= "game" then
+            love.keyboard.setKeyRepeat(true)
+        else
+            love.keyboard.setKeyRepeat(false)
         end
 
         if mode == 3 then
@@ -210,12 +229,16 @@ function gameKey(key)
         if mode == 2 then            
             if key == "left" then
                 spdMax = spdMax - 1
-                love.audio.play(se.sel_1)
+                if spdMax >= 10 then
+                    love.audio.play(se.sel_1)
+                end
             end
             
             if key == "right" then
                 spdMax = spdMax + 1
-                love.audio.play(se.sel_1)
+                if spdMax <= 50 then
+                    love.audio.play(se.sel_1)
+                end
             end
         end
     end
@@ -309,10 +332,40 @@ function gameKey(key)
     end
     
     if isPaused then
-        if key == "r" then
-            gameInit()
-            isCountdown = true
-            love.audio.play(se.sel_2)
+        if not isPauseDelay then
+            if key == "up" then
+                overSel = overSel - 1
+                oYSel = oYSel - 26
+                love.audio.play(se.sel_1)
+            end
+            if key == "down" then
+                overSel = overSel + 1
+                oYSel = oYSel + 26
+                love.audio.play(se.sel_1)
+            end
+        end
+        if key == "return" or key == keys.hit then
+            if overSel == 1 then
+                isPauseDelay = true
+                love.audio.play(se.sel_1)
+                overSel = 1
+                oYSel = 162
+            end
+            if overSel == 2 then
+                gameInit()
+                isCountdown = true
+                love.audio.play(se.sel_2)
+                overSel = 1
+                oYSel = 162
+            end
+            if overSel == 3 then
+                state = "title"
+                isExit = 0
+                love.audio.play(se.sel_2)
+                gameInit()
+                overSel = 1
+                oYSel = 162
+            end
         end
     end
 
@@ -337,11 +390,14 @@ function gameKey(key)
     elseif key == "escape" and state == "mode" then
         state = "title"
         love.audio.play(se.sel_2)
-    elseif key == "escape" and state == "game" and isPaused then
-        state = "title"
-        isExit = 0
+    elseif key == "escape" and state == "options" then
+        state = "mode"
+        optSel = 1
+        selYOpt = 64
+        if isAudio ~= decO.audio or buttonSkin ~= decO.skin or shakeEnabled ~= decO.shakeEnabled then
+            saveData("options.json", {audio = isAudio, skin = buttonSkin, shakeEnabled = shakeEnabled})
+        end
         love.audio.play(se.sel_2)
-        gameInit()
     end
     
     if key == "f4" then
@@ -402,14 +458,22 @@ function gameLoop(dt)
         -- save score
         if mode == 1 then
             if pf > hiPerf.normal then
-                saveData("score.json", {normal = pf, random = hiPerf.random})
+                saveData("score.json", {normal = pf, random = hiPerf.random, comboNormal = hiPerf.comboNormal, comboRandom = hiPerf.comboRandom})
+            end
+            
+            if maxCombo > hiPerf.comboNormal then
+                saveData("score.json", {normal = hiPerf.normal, random = hiPerf.random, comboNormal = maxCombo, comboRandom = hiPerf.comboRandom})
             end
             loadScore()
         end
 
         if mode == 2 then
             if pf > hiPerf.random then
-                saveData("score.json", {normal = hiPerf.normal, random = pf})
+                saveData("score.json", {normal = hiPerf.normal, random = pf, comboNormal = hiPerf.comboNormal, comboRandom = hiPerf.comboRandom})
+            end
+
+            if maxCombo > hiPerf.comboRandom then
+                saveData("score.json", {normal = hiPerf.normal, random = hiPerf.random, comboNormal = hiPerf.comboNormal, comboRandom = maxCombo})
             end
             loadScore()
         end
@@ -473,6 +537,17 @@ function gameLoop(dt)
         spdMax = 10
     end
 
+    if isPaused then
+        if overSel < 1 then
+            overSel = 3
+            oYSel = 162 + 26 * 2
+        end
+        if overSel > 3 then
+            overSel = 1
+            oYSel = 162
+        end
+    end
+
     if isCountdown then
         countdownCool = countdownCool + dt
     end
@@ -531,13 +606,16 @@ function gameLoop(dt)
                 miss = miss + 1
                 lifeBar = lifeBar - 16
                 seType = 0
+                combo = 0
                 isMiss = true
                 love.audio.play(se.miss)
                 if shakeEnabled then
                     isShake = true
                 end
-                    maxP = maxP + pfP
+                maxP = maxP + pfP
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
+                -- mirror of lifebar values
+                table.insert(lMObj, {gWidth - 15, 5 + 215, 7, totalLife * currLife, {1, 0.25, 0.25, 0.6}})
             end
         elseif mode == 2 then
             if timer > 1.25 and lifeBar > 0 then
@@ -549,12 +627,14 @@ function gameLoop(dt)
                 seType = 0
                 isMiss = true
                 speed = 1
+                combo = 0
                 love.audio.play(se.miss)
                 if shakeEnabled then
                     isShake = true
                 end
                 maxP = maxP + pfP
                 table.insert(msEffect, {{1, 0.25, 0.25, 1}, progX + 118, 58, 8, 18, 0})
+                table.insert(lMObj, {gWidth - 15, 5 + 215, 7, totalLife * currLife, {1, 0.25, 0.25, 0.6}})
             end
         end
         
@@ -571,6 +651,10 @@ function gameLoop(dt)
             buttonTime = 0
         end
 
+        if combo > maxCombo then
+            maxCombo = combo
+        end
+
         if speed < 0.1 then
             speed = 0.1
         end
@@ -578,16 +662,9 @@ function gameLoop(dt)
             speed = 5
         end
         
-        if animHitTime > 0 and animHitTime < 0.1 then
-            timingHit[4] = 1
-        end
-        if animHitTime > 0.1 and animHitTime < 0.5 then
-            timingHit[4] = timingHit[4] - dt * 5
-        end
         if animHitTime > 0.5 then
             isPF = false
             animHitTime = 0
-            timingHit[4] = 0
         end
 
         if timer > 0.75 and timer < 0.85 then
@@ -638,6 +715,13 @@ function gameLoop(dt)
             if v[6] > 0.75 then
                 table.remove(msEffect, i)
             end
+        end
+    end
+
+    for i, v in ipairs(lMObj) do
+        v[5][4] = v[5][4] - dt * 1.6
+        if v[5][4] < 0 then
+            table.remove(lMObj, i)
         end
     end
 

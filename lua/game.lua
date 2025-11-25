@@ -14,9 +14,10 @@ local optStrings = {
     "Enable screen shake effect."
 }
 
-local totalLife = -215
-local currLife = (lifeBar / 100)
+totalLife = -215
+currLife = (lifeBar / 100)
 local buttonYOff = 55
+local fontCombo = font[2]
 
 fTextY = 190
 seType = 0
@@ -41,6 +42,7 @@ function gameInit()
     seType = 0
     lifeBar = 100
     currP, maxP, pDisplay = 0, 0, 0
+    combo, maxCombo = 0, 0
     min, sec = 0, 0
     isPaused = false
     isFail = false
@@ -57,6 +59,7 @@ function keyInit()
     lastTimingTimer = TimingTimer
     TimingTimer = 0
     isMiss = false
+    combo = combo + 1
     seType = seType + 1
 
     if seType % 1 == 0 then
@@ -69,7 +72,7 @@ function keyInit()
     end
     
     if mode == 2 then
-        speed = 1 * (0.1 * love.math.random(10, spdMax))
+        speed = 0.1 * love.math.random(10, spdMax)
     end
 
     if shakeEnabled then
@@ -182,15 +185,19 @@ function gameUI()
         love.graphics.setColor(red)
     end
 
-    -- any better solution though
     if lifeBar <= 0 then
         love.graphics.setColor(0, 0, 0, 0)
     end
-
+    
     love.graphics.rectangle("fill", gWidth - 15, 5 + 215, 7, totalLife * currLife)
+    
+    for _, lMiss in ipairs(lMObj) do
+        love.graphics.setColor(lMiss[5])
+        love.graphics.rectangle("fill", lMiss[1], lMiss[2], lMiss[3], lMiss[4])
+    end
 
     love.graphics.setColor(white)
-    love.graphics.printf({tipCol, string.format("%.2f", speed) .. "x | " .. bpm .. " bpm"}, font[2], 0, gHeight - 42, gWidth, "center")
+    love.graphics.printf({tipCol, string.format("%.2f", speed) .. "x | " .. string.format("%.0f", bpm) .. " bpm"}, font[2], 0, gHeight - 42, gWidth, "center")
     love.graphics.setColor({0.95, 0.7, 0.6, 0.05})
     love.graphics.rectangle("fill", 0, gHeight - 50, gWidth, 27)
 
@@ -215,7 +222,13 @@ function gameUI()
     else
         love.graphics.setColor(tipCol)
         love.graphics.printf("Press SPACE on blue", font[2], 10, judgeY + 7, gWidth - 24, "center")
-    end    
+    end
+
+    love.graphics.setColor(1, 1, 1)
+    if combo >= 5 then
+        love.graphics.print({{0.9, 0.45, 0.75, 1}, "COMBO\n", white, combo .. "x"}, fontCombo, 10, 155)
+        fontCombo:setLineHeight(1.2)
+    end
 
     love.graphics.setColor(white)
     if pDisplay == 0 then
@@ -258,29 +271,13 @@ function modeUI()
     love.graphics.setColor(1, 1, 1, 0.15)
     love.graphics.rectangle("fill", 0, selY, gWidth, 26)
     
-    --TODO: Show best score on mode menu
     love.graphics.setColor(1, 1, 1)
     if mode == 1 then
         love.graphics.printf(modeStrings[1], font[2], 0, gHeight - 70, gWidth, "center")
-        love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.normal}, font[2], 0, gHeight - 90, gWidth, "center")
+        love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.normal, {1, 1, 1, 0.35}, " | ", white, "best combo ", {0.9, 0.45, 0.75, 1}, hiPerf.comboNormal .. "x"}, font[2], 0, gHeight - 90, gWidth, "center")
     elseif mode == 2 then
         love.graphics.printf(modeStrings[2], font[2], 0, gHeight - 70, gWidth, "center")
-        love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.random}, font[2], 0, gHeight - 90, gWidth - 110, "center")
-        if spdMax < 30 then
-            if spdMax == 10 then
-                love.graphics.printf({red, "max ", white, 1 * (0.1 * spdMax) .. "x >"}, font[2], 0, gHeight - 90, gWidth + 110, "center")
-            elseif spdMax == 50 then
-                love.graphics.printf({white, "< ", red, "max ", white, 1 * (0.1 * spdMax) .. "x"}, font[2], 0, gHeight - 90, gWidth + 110, "center")
-            else
-                love.graphics.printf({white, "< ", red, "max ", white, 1 * (0.1 * spdMax) .. "x >"}, font[2], 0, gHeight - 90, gWidth + 110, "center")
-            end
-        else
-            if spdMax == 50 then
-                love.graphics.printf({white, "< ", red, "max ", 1 * (0.1 * spdMax) .. "x"}, font[2], 0, gHeight - 90, gWidth + 110, "center")
-            else
-                love.graphics.printf({white, "< ", red, "max ", 1 * (0.1 * spdMax) .. "x", white, " >"}, font[2], 0, gHeight - 90, gWidth + 110, "center")
-            end
-        end
+        love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.random, {1, 1, 1, 0.35}, " | ", {0.9, 0.45, 0.75, 1}, hiPerf.comboRandom .. "x", red, "   max ", white, "< ".. 0.1 * spdMax .. "x >"}, font[2], 0, gHeight - 90, gWidth, "center")
     elseif mode == 3 then
         love.graphics.printf(modeStrings[3], font[2], 0, gHeight - 70, gWidth, "center")
     elseif mode == 4 then
@@ -343,27 +340,35 @@ end
 function pauseUI()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf("- PAUSED -", font[3], 0, 50, gWidth, "center")
-    love.graphics.printf({{1, 0.5, 0.25}, "Escape:", {1, 1, 1}, " Exit", {1, 1, 0.35}, "\nP:", {1, 1, 1}, " Unpause", {0.95, 0.7, 0}, "\nR:", {1, 1, 1}, " Reset"}, font[1], 0, 195, gWidth, "center")
+    love.graphics.setColor(1, 1, 1, 0.5)
+    love.graphics.printf("Up/Down to navigate", font[2], 0, 140, gWidth, "center")
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.printf("resume", font[3], 0, 162, gWidth, "center")
+    love.graphics.printf("retry", font[3], 0, 162 + 26, gWidth, "center")
+    love.graphics.printf("quit", font[3], 0, 162 + 26 * 2, gWidth, "center")
+    love.graphics.setColor(1, 1, 0.75, 0.15)
+    love.graphics.rectangle("fill", 0, oYSel, gWidth, 26)
 end
 
 function failUI()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf({{0.95, 0.7, 0.4}, "- RESULTS -"}, font[3], 0, 30, gWidth, "center")
-    love.graphics.printf({timingCol[2], "PF: " .. pf, timingCol[3], "\nGR: " .. great, timingCol[4], "\nGD: " .. good, timingCol[1], "\nMS: " .. miss, {1, 1, 1}, "\nTOTAL: " .. pf + great + good}, font[1], 0, 58, gWidth, "center")
+    love.graphics.printf({timingCol[2], "PF: " .. pf, timingCol[3], "\nGR: " .. great, timingCol[4], "\nGD: " .. good, timingCol[1], "\nMS: " .. miss, {0.9, 0.45, 0.75, 1}, "\nMAX COMBO: " .. maxCombo .. "x", {1, 1, 1}, "\nTOTAL: " .. pf + great + good}, font[1], 0, 58, gWidth, "center")
     
     if mode == 2 then
         if spdMax < 30 then
-            love.graphics.printf({red, "max: ", white, 1 * (0.1 * spdMax) .. "x"}, font[1], 0, 180, gWidth, "center")
+            love.graphics.printf({red, "max: ", white, 0.1 * spdMax .. "x"}, font[1], 0, 192, gWidth, "center")
         else
-            love.graphics.printf({red, "max: " .. 1 * (0.1 * spdMax) .. "x"}, font[1], 0, 180, gWidth, "center")
+            love.graphics.printf({red, "max: " .. 0.1 * spdMax .. "x"}, font[1], 0, 192, gWidth, "center")
         end
     end
-
-    --TODO: Change color on high score
-    love.graphics.printf({{0.95, 0.7, 0.6}, string.format("%.2f", pDisplay) .. "%\n" .. string.format("%02d", math.floor(min)) .. ":" .. string.format("%02d", math.floor(sec))}, font[2], 0, 152, gWidth, "center")
     
-    love.graphics.printf({{1, 0.5, 0.25}, "Escape", {1, 1, 1}, " to exit"}, font[2], 0, fTextY, gWidth, "center")
-    love.graphics.printf({{0.95, 0.7, 0.2}, "R", {1, 1, 1}, " to restart"}, font[2], 0, fTextY + 17, gWidth, "center")
+    --TODO: Change color on high score
+    love.graphics.printf({{0.95, 0.7, 0.6}, string.format("%.2f", pDisplay) .. "%\n" .. string.format("%02d", math.floor(min)) .. ":" .. string.format("%02d", math.floor(sec))}, font[2], 0, 167, gWidth, "center")
+    
+    --TODO: Add buttons on fail menu
+    love.graphics.printf({{1, 0.5, 0.25}, "Escape", {1, 1, 1}, " to exit"}, font[2], 0, fTextY + 10, gWidth, "center")
+    love.graphics.printf({{0.95, 0.7, 0.2}, "R", {1, 1, 1}, " to restart"}, font[2], 0, fTextY + 27, gWidth, "center")
 end
 
 function debugUI()

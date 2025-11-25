@@ -1,7 +1,7 @@
 wWidth, wHeight = love.graphics.getWidth(), love.graphics.getHeight()
 gWidth, gHeight = 330, 280
 tX, tY = (wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23
-ver = "v1.0"
+ver = "v1.1"
 
 font = {
     love.graphics.newFont("/assets/fonts/monogram.ttf", 22),
@@ -33,9 +33,10 @@ lastTimingTimer = 0
 bpm = 60 * speed
 pDisplay = 0
 
+combo, maxCombo = 0, 0
+
 min, sec = 0, 0
 
---TODO: Finish button skin function
 buttonSkin = 1
 shakeEnabled = true
 
@@ -53,6 +54,10 @@ optSel = 1
 selYOpt = 64
 optionsSave = {}
 
+-- pause & fail selection
+overSel = 1
+oYSel = 162
+
 isAudio = true
 
 width = 120
@@ -62,6 +67,7 @@ pf, great, good, miss = 0, 0, 0, 0
 
 -- life bar
 lifeBar = 100
+lMObj = {}
 
 keys = {
     hit = "space",

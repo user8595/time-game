@@ -1,5 +1,5 @@
+love.graphics.setBackgroundColor(0.03, 0.03, 0.03)
 function love.load()
-    love.graphics.setBackgroundColor(0.03, 0.03, 0.03)
     love.graphics.setDefaultFilter("nearest", "nearest")
     
     require("lua.defaults")
@@ -8,7 +8,7 @@ function love.load()
     require("lua.game")
     
     newSave("options.json", {audio = true, skin = 1, shakeEnabled = true})
-    newSave("score.json", {normal = 0, random = 0})
+    newSave("score.json", {normal = 0, random = 0, comboNormal = 0, comboRandom = 0})
     loadOptions()
     loadScore()
     
@@ -37,6 +37,14 @@ end
 
 function love.resize(w, h)
     wWidth, wHeight = w, h
+end
+
+function love.focus(f)
+    if not f then
+        if state == "game" and not isPaused and not isFail then
+            isPaused = true
+        end
+    end
 end
 
 function love.draw()
