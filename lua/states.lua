@@ -84,7 +84,7 @@ function gameKey(key)
 
     if state == "game" then
         if not isPaused and not isFail and not isCountdown then
-            if not love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
+            if not love.keyboard.hasKeyRepeat() then
                 if key == keys.hit and timer > 0.75 and timer < 0.85 then
                     table.insert(timingEffect, {{0.25, 0.5, 1, 1}, eX, eY, eW, eH, eT})
                     good = good + 1
@@ -132,15 +132,14 @@ function gameKey(key)
                 end
             end
             
-        if mode == 1 then
-            if key == "up" and speed < 5 then
-                if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
-                    love.keyboard.setKeyRepeat(true)
-                    speed = speed + .25
-                else
-                    love.keyboard.setKeyRepeat(false)
-                    speed = speed + .05
-                end
+            if mode == 1 then
+                if key == "up" and speed < 5 then
+                    if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
+                        speed = speed + .25
+                    else
+                        speed = speed + .05
+                    end
+
                     buttonTime = 0
                     timer = 0
                     lastTimer = 0
@@ -192,7 +191,7 @@ function gameKey(key)
                 love.audio.play(se.sel_2)
             end
         end
-
+        
         if mode == 2 and state ~= "game" then
             love.keyboard.setKeyRepeat(true)
         else
@@ -414,6 +413,15 @@ function gameLoop(dt)
         love.audio.setVolume(0)
     else
         love.audio.setVolume(1)
+    end
+
+    
+    if not isPaused and not isPauseDelay and state == "game" then
+        if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
+            love.keyboard.setKeyRepeat(true)
+        else
+            love.keyboard.setKeyRepeat(false)
+        end
     end
 
     if state == "options" then
