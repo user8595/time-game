@@ -119,7 +119,7 @@ function pauseDelayFunc(dt)
 end
 
 function gameUI()
-    if state == "game" then
+    if state == "game" and not isCountdown then
         for _, v in ipairs(timingEffect) do
             love.graphics.setColor(v[1])
             love.graphics.rectangle("fill", v[2], v[3] + buttonYOff, v[4], v[5])
