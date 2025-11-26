@@ -1,3 +1,4 @@
+local table_clear = require("table.clear")
 local progX = (gWidth - 120) / 2
 local pfP, grP, gdP = 2, 1.95, 1.5
 currP, maxP = 0, 0
@@ -367,6 +368,8 @@ function gameKey(key)
             mode = 1
             selY = 64
             isExit = -1
+            table_clear(timingEffect)
+            table_clear(tObjCircle)
             love.audio.play(se.sel_1)
         end
 
