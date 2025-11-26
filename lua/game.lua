@@ -36,6 +36,7 @@ function gameInit()
     tableClear(timingEffect)
     tableClear(pfEffect)
     tableClear(msEffect)
+    tableClear(lMObj)
     speed = 1
     lastTimer = 0
     TimingTimer = 0
@@ -83,7 +84,7 @@ function keyInit()
 end
 
 function gameOverlay()
-    love.graphics.setColor(0, 0, 0, 0.85)
+    love.graphics.setColor(0.07, 0.05, 0.08, 0.85)
     love.graphics.rectangle("fill", 0, 0, wWidth, wHeight)
 end
 
@@ -118,9 +119,15 @@ function pauseDelayFunc(dt)
 end
 
 function gameUI()
-    for _, v in ipairs(timingEffect) do
-        love.graphics.setColor(v[1])
-        love.graphics.rectangle("fill", v[2], v[3] + buttonYOff, v[4], v[5])
+    if state == "game" then
+        for _, v in ipairs(timingEffect) do
+            love.graphics.setColor(v[1])
+            love.graphics.rectangle("fill", v[2], v[3] + buttonYOff, v[4], v[5])
+        end
+        for _, v in ipairs(tObjCircle) do
+            love.graphics.setColor(v[1])
+            love.graphics.circle("fill", v[2], v[3], v[4])
+        end
     end
     
     if timer > 1 then
@@ -129,7 +136,12 @@ function gameUI()
         elseif buttonSkin == 2 then
             love.graphics.setColor({1, 0.75, 0.45, 0.5})
         end
-        love.graphics.rectangle("fill", gWidth / 2 - 25 - 5, 5 + buttonYOff, 50, 50)
+        if buttonSkin == 3 then
+            love.graphics.setColor({1, 0.75, 0.45, 0.5})
+            love.graphics.circle("fill", gWidth / 2 - 5, 85, 24)
+        else
+            love.graphics.rectangle("fill", gWidth / 2 - 25 - 5, 5 + buttonYOff, 50, 50)
+        end
     end
 
     if buttonSkin == 1 then
@@ -153,6 +165,16 @@ function gameUI()
             love.graphics.setColor(1, 1, 1)
             love.graphics.draw(tex.button_2, gWidth / 2 - 25 + 20, 10 + buttonYOff + 20, 0, b2S, b2S, tex.button_2:getWidth() / 2, tex.button_2:getHeight() / 2)
         end
+    elseif buttonSkin == 3 then
+        love.graphics.setColor(1, 0.75, 0.25)
+        love.graphics.push()
+        love.graphics.translate(gWidth / 2 - 5, 85)
+        love.graphics.rotate(math.pi * 1.5)
+        if state ~= "game" or isCountdown then
+        else
+            love.graphics.arc("fill", 0, 0, 20, 0, circRad)
+        end
+        love.graphics.pop()
     end
 
     love.graphics.setColor(tCol)
@@ -255,8 +277,49 @@ end
 function titleUI()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf("time", font[3], 0, 12, gWidth, "center")
-    love.graphics.printf({{0.95, 0.5, 0.4}, "\n\n\ncontrols\n\n", {0.95, 0.7, 0.4}, "[space]", {1, 1, 1},  " hit object\n", {0.95, 0.7, 0.4}, "[p]", {1, 1, 1}, " pause\n\n", {0.95, 0.7, 0.4}, "[up/down] ", {1, 1, 1}, "adjust\nspeed\n (normal only)", {1, 1, 1}, "\n\npress ", {0.95, 0.7, 0.4}, "space ", {1, 1, 1}, "to play",}, font[1], 0, -2, gWidth, "center")
     love.graphics.print(ver, font[2], 10, gHeight - 44)
+    
+    love.graphics.setColor(1, 1, 1)
+    if titleState == 1 then
+        love.graphics.push()
+        love.graphics.translate(0, -6)
+        love.graphics.push()
+        love.graphics.translate(2, 0)
+        for _, v in ipairs(timingEffect) do
+            love.graphics.setColor(v[1])
+            love.graphics.rectangle("fill", v[2], v[3] + buttonYOff, v[4], v[5])
+        end
+        for _, v in ipairs(tObjCircle) do
+            love.graphics.setColor(v[1])
+            love.graphics.circle("fill", v[2], v[3], v[4])
+        end
+        if titleSkin == 1 then
+            love.graphics.setColor(TButtonCol)
+            love.graphics.rectangle("fill", gWidth / 2 - 23, 40 + 55, 40, 40)
+            love.graphics.setColor(TtextCol)
+            love.graphics.printf("HIT!", font[2], 2, 55 + 55, gWidth - 6, "center")
+        elseif titleSkin == 2 then
+            love.graphics.setColor(1, 0.7, 0.5, 0.65)
+            love.graphics.rectangle("line", gWidth / 2 - 23, 40 + 55, 40, 40)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.draw(tex.button_2, gWidth / 2 - 3, 40 + 75, 0, Tb2S, Tb2S, tex.button_2:getWidth() / 2, tex.button_2:getHeight() / 2)
+        elseif titleSkin == 3 then
+            love.graphics.setColor(1, 0.75, 0.25)
+            love.graphics.push()
+            love.graphics.translate(gWidth / 2 - 3, 115)
+            love.graphics.rotate(math.pi * 1.5)
+            love.graphics.arc("fill", 0, 0, 20, 0, (math.pi * 2) * titleAnimTime)
+            love.graphics.pop()
+        end
+        love.graphics.pop()
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.rectangle("fill", 125, 147, 79 * titleAnimTime, 7)
+        love.graphics.pop()
+        -- i'll do anything but clean code
+        love.graphics.printf({{1, 1, 1}, "\n\n\n\n\n\n\n\n\n\n\n\npress ", {0.95, 0.7, 0.4}, "space ", {1, 1, 1}, "to play",}, font[1], 0, -2, gWidth, "center")
+    elseif titleState == 2 then
+        love.graphics.printf({{0.95, 0.5, 0.4}, "\n\n\ncontrols\n\n", {0.95, 0.7, 0.4}, "[space]", {1, 1, 1},  " hit object\n", {0.95, 0.7, 0.4}, "[p]", {1, 1, 1}, " pause\n\n", {0.95, 0.7, 0.4}, "[up/down] ", {1, 1, 1}, "adjust\nspeed\n (normal only)", {1, 1, 1}, "\n\npress ", {0.95, 0.7, 0.4}, "space ", {1, 1, 1}, "to play",}, font[1], 0, -2, gWidth, "center")
+    end
 end
 
 --TODO: Add mouse function
@@ -277,7 +340,19 @@ function modeUI()
         love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.normal, {1, 1, 1, 0.35}, " | ", white, "best combo ", {0.9, 0.45, 0.75, 1}, hiPerf.comboNormal .. "x"}, font[2], 0, gHeight - 90, gWidth, "center")
     elseif mode == 2 then
         love.graphics.printf(modeStrings[2], font[2], 0, gHeight - 70, gWidth, "center")
-        love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.random, {1, 1, 1, 0.35}, " | ", {0.9, 0.45, 0.75, 1}, hiPerf.comboRandom .. "x", red, "   max ", white, "< ".. 0.1 * spdMax .. "x >"}, font[2], 0, gHeight - 90, gWidth, "center")
+        if spdMax > 30 then
+            if spdMax >= 50 then
+                love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.random, {1, 1, 1, 0.35}, " | ", {0.9, 0.45, 0.75, 1}, hiPerf.comboRandom .. "x", red, "   max ", white, "< ", red, 0.1 * spdMax .. "x "}, font[2], 0, gHeight - 90, gWidth, "center")
+            else
+                love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.random, {1, 1, 1, 0.35}, " | ", {0.9, 0.45, 0.75, 1}, hiPerf.comboRandom .. "x", red, "   max ", white, "< ", red, 0.1 * spdMax .. "x ", white, ">"}, font[2], 0, gHeight - 90, gWidth, "center")
+            end
+        else
+            if spdMax <= 15 then
+                love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.random, {1, 1, 1, 0.35}, " | ", {0.9, 0.45, 0.75, 1}, hiPerf.comboRandom .. "x", red, "   max ", white, 0.1 * spdMax .. "x >"}, font[2], 0, gHeight - 90, gWidth, "center")
+            else
+                love.graphics.printf({white, "best perf. ", {0.5, 1, 1, 1}, hiPerf.random, {1, 1, 1, 0.35}, " | ", {0.9, 0.45, 0.75, 1}, hiPerf.comboRandom .. "x", red, "   max ", white, "< ".. 0.1 * spdMax .. "x >"}, font[2], 0, gHeight - 90, gWidth, "center")
+            end
+        end
     elseif mode == 3 then
         love.graphics.printf(modeStrings[3], font[2], 0, gHeight - 70, gWidth, "center")
     elseif mode == 4 then

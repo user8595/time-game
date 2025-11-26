@@ -42,6 +42,8 @@ shakeEnabled = true
 
 b2S = 2.5
 
+circRad = (math.pi * 2)
+
 -- hide timing text
 isMiss = true
 animHitTime = 0
@@ -69,6 +71,9 @@ pf, great, good, miss = 0, 0, 0, 0
 lifeBar = 100
 lMObj = {}
 
+-- text info
+textInfo = {}
+
 keys = {
     hit = "space",
 }
@@ -78,7 +83,7 @@ eX, eY, eW, eH, eT = gWidth / 2 - 29, 6, 48, 48, 0
 
 -- timing effect object
 timingEffect, pfEffect, msEffect = {}, {}, {}
-
+tObjCircle = {}
 buttonCol, textCol = {1, 1, 1, 0}, {0, 0, 0, 0}
 buttonRed = {1, 0.25, 0.25, 0}
 

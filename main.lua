@@ -1,5 +1,5 @@
-love.graphics.setBackgroundColor(0.03, 0.03, 0.03)
 function love.load()
+    love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
     love.graphics.setDefaultFilter("nearest", "nearest")
     
     require("lua.defaults")
@@ -41,7 +41,7 @@ end
 
 function love.focus(f)
     if not f then
-        if state == "game" and not isPaused and not isFail then
+        if state == "game" and not isPaused and not isFail and not isCountdown then
             isPaused = true
         end
     end

@@ -2,6 +2,9 @@ local progX = (gWidth - 120) / 2
 local pfP, grP, gdP = 2, 1.95, 1.5
 currP, maxP = 0, 0
 
+-- title screen anim & states
+titleSkin, titleState, titleAnimTime = 1, 1, 0
+
 function gameDisplay()
     -- game
     love.graphics.push()
@@ -65,20 +68,38 @@ function gameDisplay()
     if isPaused and not isPauseDelay then
         pauseUI()
     end
-    love.graphics.pop()
 
+    love.graphics.pop()
+    
     if isDebug then
         debugUI()
+    end
+
+    for i, txt in ipairs(textInfo) do
+        love.graphics.setColor(1, 1, 1, 0.5)
+        love.graphics.printf(txt[1], font[2], (wWidth - gWidth) / 2, love.graphics.getHeight() - 40 - 20 * (i - 1), gWidth, "center")
     end
 end
 
 function gameKey(key)
-    --TODO: Add scaling in fullscreen mode
+    -- somewhat a workaround
     if key == "f11" then
         if not love.window.getFullscreen() then
-            love.window.setFullscreen(true)
+            love.window.setMode(800, 600, {fullscreen = true, fullscreentype = "exclusive"})
+            wWidth, wHeight = 800, 600
         else
-            love.window.setFullscreen(false)
+            love.window.setMode(gWidth, gHeight, {fullscreen = false})
+            wWidth, wHeight = gWidth, gHeight
+        end
+    end
+
+    if key == "f3" then
+        if love.window.getVSync() == 0 then
+            love.window.setVSync(1)
+            table.insert(textInfo, {"vsync enabled", 0})
+        else
+            love.window.setVSync(0)
+            table.insert(textInfo, {"vsync disabled", 0})
         end
     end
 
@@ -86,7 +107,11 @@ function gameKey(key)
         if not isPaused and not isFail and not isCountdown then
             if not love.keyboard.hasKeyRepeat() then
                 if key == keys.hit and timer > 0.75 and timer < 0.85 then
-                    table.insert(timingEffect, {{0.25, 0.5, 1, 1}, eX, eY, eW, eH, eT})
+                    if buttonSkin == 3 then
+                        table.insert(tObjCircle, {{0.5, 1, 1, 1}, gWidth / 2 - 5, 85, 26, 0})
+                    else
+                        table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
+                    end
                     good = good + 1
                     lifeBar = lifeBar + 3
                     keyInit()
@@ -95,7 +120,11 @@ function gameKey(key)
                 end
                 
                 if key == keys.hit and timer > 0.85 and timer < 0.95 then
-                    table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
+                    if buttonSkin == 3 then
+                        table.insert(tObjCircle, {{1, 0.5, 0.25, 1}, gWidth / 2 - 5, 85, 26, 0})
+                    else
+                        table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
+                    end
                     great = great + 1
                     lifeBar = lifeBar + 4
                     keyInit()
@@ -104,7 +133,11 @@ function gameKey(key)
                 end
             
                 if key == keys.hit and timer > 0.95 and timer < 1.05 then
-                    table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
+                    if buttonSkin == 3 then
+                        table.insert(tObjCircle, {{0.5, 1, 1, 1}, gWidth / 2 - 5, 85, 26, 0})
+                    else
+                        table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
+                    end
                     table.insert(pfEffect, {{0.5, 1, 1, 1}, progX + 88, 58, 13, 18, 0})
                     pf = pf + 1
                     lifeBar = lifeBar + 5
@@ -114,7 +147,11 @@ function gameKey(key)
                 end
                 
                 if key == keys.hit and timer > 1.05 and timer < 1.15 then
-                    table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
+                    if buttonSkin == 3 then
+                        table.insert(tObjCircle, {{1, 0.5, 0.25, 1}, gWidth / 2 - 5, 85, 26, 0})
+                    else
+                        table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
+                    end
                     great = great + 1
                     lifeBar = lifeBar + 4
                     keyInit()
@@ -123,7 +160,11 @@ function gameKey(key)
                 end
             
                 if key == keys.hit and timer > 1.15 and timer < 1.25 then
-                    table.insert(timingEffect, {{0.25, 0.5, 1, 1}, eX, eY, eW, eH, eT})
+                    if buttonSkin == 3 then
+                        table.insert(tObjCircle, {{0.5, 1, 1, 1}, gWidth / 2 - 5, 85, 26, 0})
+                    else
+                        table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
+                    end
                     good = good + 1
                     lifeBar = lifeBar + 3
                     keyInit()
@@ -228,7 +269,7 @@ function gameKey(key)
         if mode == 2 then            
             if key == "left" then
                 spdMax = spdMax - 1
-                if spdMax >= 10 then
+                if spdMax >= 15 then
                     love.audio.play(se.sel_1)
                 end
             end
@@ -326,7 +367,17 @@ function gameKey(key)
             mode = 1
             selY = 64
             isExit = -1
-            love.audio.play(se.sel_2)
+            love.audio.play(se.sel_1)
+        end
+
+        if key == "left" then
+            titleState = titleState - 1
+            love.audio.play(se.sel_1)
+        end
+
+        if key == "right" then
+            titleState = titleState + 1
+            love.audio.play(se.sel_1)
         end
     end
     
@@ -358,8 +409,8 @@ function gameKey(key)
                 oYSel = 162
             end
             if overSel == 3 then
-                state = "title"
-                isExit = 0
+                state = "mode"
+                isExit = -1
                 love.audio.play(se.sel_2)
                 gameInit()
                 overSel = 1
@@ -408,6 +459,8 @@ function gameKey(key)
     end
 end
 
+TButtonCol, TtextCol = {1, 1 ,1, 0}, {0, 0, 0, 0}
+Tb2S = 2.5
 function gameLoop(dt)
     if not isAudio then
         love.audio.setVolume(0)
@@ -415,6 +468,73 @@ function gameLoop(dt)
         love.audio.setVolume(1)
     end
 
+    for i, txt in ipairs(textInfo) do
+        txt[2] = txt[2] + dt
+        if txt[2] > 1 then
+            table.remove(textInfo, i)
+        end
+    end
+
+    if state ~= "game" then
+        titleAnimTime = titleAnimTime + dt
+        TButtonCol[4] = TButtonCol[4] + dt
+        TtextCol[4] = TtextCol[4] + dt
+        Tb2S = (titleAnimTime * 2.5)
+
+        -- title state in pages
+        if titleState < 1 then
+            titleState = 2
+        end
+
+        if titleState > 2 then
+            titleState = 1
+        end
+
+        -- title animation
+        if titleAnimTime > 1 then
+            titleSkin = titleSkin + 1
+            titleAnimTime = 0
+            TButtonCol[4], TtextCol[4], Tb2S = 0, 0, 0
+            if titleSkin > 3 then
+                table.insert(tObjCircle, {{0.5, 1, 1, 1}, gWidth / 2 - 3, 115, 26, 0})
+            else
+                table.insert(timingEffect, {{0.5, 1, 1, 1}, eX + 2, eY + 30, eW, eH, eT})
+            end
+        end
+
+        if titleSkin > 3 then
+            titleSkin = 1
+        end
+
+        -- ctrl + c - v
+        for i, v in ipairs(timingEffect) do
+            v[6] = v[6] + dt
+            
+            if v[6] > 0 then
+                v[1][4] = v[1][4] - dt * 3
+            end
+            
+            if v[6] > 0.75 then
+                table.remove(timingEffect, i)
+            end
+        end
+        for i, v in ipairs(tObjCircle) do
+            v[5] = v[5] + dt
+            
+            if v[5] > 0 then
+                v[1][4] = v[1][4] - dt * 3
+            end
+            
+            if v[5] > 0.75 then
+                table.remove(tObjCircle, i)
+            end
+        end
+    else
+        titleState = 1
+        titleSkin = 1
+        titleAnimTime = 0
+        TButtonCol[4], TtextCol[4], Tb2S = 0, 0, 0
+    end
     
     if not isPaused and not isPauseDelay and state == "game" then
         if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
@@ -437,16 +557,16 @@ function gameLoop(dt)
     end
 
     if buttonSkin < 1 then
-        buttonSkin = 2
+        buttonSkin = 3
     end
     
-    if buttonSkin > 2 then
+    if buttonSkin > 3 then
         buttonSkin = 1
     end
 
     bpm = 60 * speed
 
-    if state == "title" or state == "mode" then
+    if state == "mode" then
         se.sel_2:setPitch(1.25)
     end
     
@@ -541,8 +661,8 @@ function gameLoop(dt)
         spdMax = 50
     end
 
-    if spdMax < 10 then
-        spdMax = 10
+    if spdMax < 15 then
+        spdMax = 15
     end
 
     if isPaused then
@@ -581,6 +701,7 @@ function gameLoop(dt)
         TimingTimer = TimingTimer + dt
         timer = timer + dt * speed
         b2S = (timer * 2.5)
+        circRad = (math.pi * 2) * timer
         buttonTime = buttonTime + dt * speed
         sec = sec + dt
         if sec > 59 then
@@ -698,6 +819,18 @@ function gameLoop(dt)
 
             if v[6] > 0.75 then
                 table.remove(timingEffect, i)
+            end
+        end
+
+        for i, v in ipairs(tObjCircle) do
+            v[5] = v[5] + dt
+            
+            if v[5] > 0 then
+                v[1][4] = v[1][4] - dt * 3
+            end
+            
+            if v[5] > 0.75 then
+                table.remove(tObjCircle, i)
             end
         end
 
