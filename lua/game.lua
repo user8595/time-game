@@ -315,11 +315,38 @@ function titleUI()
         love.graphics.setColor(1, 1, 1)
         love.graphics.rectangle("fill", 125, 147, 79 * titleAnimTime, 7)
         love.graphics.pop()
-        -- i'll do anything but clean code
-        love.graphics.printf({{1, 1, 1}, "\n\n\n\n\n\n\n\n\n\n\n\npress ", {0.95, 0.7, 0.4}, "space ", {1, 1, 1}, "to play",}, font[1], 0, -2, gWidth, "center")
     elseif titleState == 2 then
-        love.graphics.printf({{0.95, 0.5, 0.4}, "\n\n\ncontrols\n\n", {0.95, 0.7, 0.4}, "[space]", {1, 1, 1},  " hit object\n", {0.95, 0.7, 0.4}, "[p]", {1, 1, 1}, " pause\n\n", {0.95, 0.7, 0.4}, "[up/down] ", {1, 1, 1}, "adjust\nspeed\n (normal only)", {1, 1, 1}, "\n\npress ", {0.95, 0.7, 0.4}, "space ", {1, 1, 1}, "to play",}, font[1], 0, -2, gWidth, "center")
+        love.graphics.printf({{0.95, 0.5, 0.4}, "\n\n\ncontrols"}, font[1], 0, -2, gWidth, "center")
+        if love.keyboard.isDown("p") then
+            love.graphics.draw(tex.p_p, 80, 80, 0, 2, 2)
+        else
+            love.graphics.draw(tex.p, 80, 80, 0, 2, 2)
+        end
+        if love.keyboard.isDown("up") then
+            love.graphics.draw(tex.up_p, 180, 80, 0, 2, 2)
+        else
+            love.graphics.draw(tex.up, 180, 80, 0, 2, 2)
+        end
+        if love.keyboard.isDown("down") then
+            love.graphics.draw(tex.down_p, 215, 80, 0, 2, 2)
+        else
+            love.graphics.draw(tex.down, 215, 80, 0, 2, 2)
+        end
+        love.graphics.draw(tex.space, 80, 135, 0, 2, 2)
+        if love.keyboard.isDown("f3") then
+            love.graphics.draw(tex.f3_p, 215, 135, 0, 2, 2)
+        else
+            love.graphics.draw(tex.f3, 215, 135, 0, 2, 2)
+        end
+        love.graphics.printf("pause game", font[2], 80, 117, gWidth, "left")
+        love.graphics.printf("adj. speed", font[2], 0, 117, gWidth - 80, "right")
+        love.graphics.printf("hit button", font[2], 80, 173, gWidth, "left")
+        love.graphics.printf("toggle vsync", font[2], 0, 173, gWidth - 80, "right")
     end
+    -- i'll do anything but clean code
+    love.graphics.printf({{1, 1, 1}, "\n\n\n\n\n\n\n\n\n\n\n\npress ", {0.95, 0.7, 0.4}, "space ", {1, 1, 1}, "to play",}, font[1], 0, 4, gWidth, "center")
+    love.graphics.setColor(1, 1, 1, 0.25)
+    love.graphics.printf("<      >", font[2], 0, gHeight - 85, gWidth, "center")
 end
 
 --TODO: Add mouse function

@@ -23,7 +23,16 @@ function love.load()
     -- textures
     tex = {
         logo = love.graphics.newImage("/assets/icon.png"),
-        button_2 = love.graphics.newImage("/assets/tex/button_2.png")
+        button_2 = love.graphics.newImage("/assets/tex/button_2.png"),
+        up = love.graphics.newImage("/assets/tex/key-up.png"),
+        up_p = love.graphics.newImage("/assets/tex/key-up1.png"),
+        down = love.graphics.newImage("/assets/tex/key-down.png"),
+        down_p = love.graphics.newImage("/assets/tex/key-down1.png"),
+        p = love.graphics.newImage("/assets/tex/key-p.png"),
+        p_p = love.graphics.newImage("/assets/tex/key-p1.png"),
+        f3 = love.graphics.newImage("/assets/tex/key-f3.png"),
+        f3_p = love.graphics.newImage("/assets/tex/key-f31.png"),
+        space = love.graphics.newImage("/assets/tex/key-space.png"),
     }
 end
 

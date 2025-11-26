@@ -77,8 +77,8 @@ function gameDisplay()
     end
 
     for i, txt in ipairs(textInfo) do
-        love.graphics.setColor(1, 1, 1, 0.5)
-        love.graphics.printf(txt[1], font[2], (wWidth - gWidth) / 2, love.graphics.getHeight() - 40 - 20 * (i - 1), gWidth, "center")
+        love.graphics.setColor(txt[1])
+        love.graphics.printf(txt[2], font[2], (wWidth - gWidth) / 2, love.graphics.getHeight() - 40 - 20 * (i - 1), gWidth, "center")
     end
 end
 
@@ -97,10 +97,10 @@ function gameKey(key)
     if key == "f3" then
         if love.window.getVSync() == 0 then
             love.window.setVSync(1)
-            table.insert(textInfo, {"vsync enabled", 0})
+            table.insert(textInfo, {{0.65, 1, 0.5, 0.75}, "vsync enabled", 0})
         else
             love.window.setVSync(0)
-            table.insert(textInfo, {"vsync disabled", 0})
+            table.insert(textInfo, {{1, 0.5, 0.5, 0.75}, "vsync disabled", 0})
         end
     end
 
@@ -472,8 +472,8 @@ function gameLoop(dt)
     end
 
     for i, txt in ipairs(textInfo) do
-        txt[2] = txt[2] + dt
-        if txt[2] > 1 then
+        txt[3] = txt[3] + dt
+        if txt[3] > 1 then
             table.remove(textInfo, i)
         end
     end
