@@ -1,11 +1,32 @@
+local lovesize = require("lib.lovesize")
+local mX, mY = love.mouse.getPosition()
+local getOS = love.system.getOS()
+
 function love.load()
+    local system = love.system
     love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
-    love.graphics.setDefaultFilter("nearest", "nearest")
+    -- TODO: Finish mobile support
+    if getOS == "Android" or getOS == "iOS" then
+        love.graphics.setDefaultFilter("linear", "linear")
+    else
+        love.graphics.setDefaultFilter("nearest", "nearest")
+    end
+    -- duct tape
+    gWindow = love.graphics.newCanvas(330, 280)
+    gFull = love.graphics.newCanvas(480, 360)
+    gCursor = love.mouse.newCursor("/assets/tex/cursor.png", 7, 7)
+    lovesize.set(330, 280)
+    love.mouse.setCursor(gCursor)
     
     require("lua.defaults")
     require("lua.states")
     require("lua.save")
     require("lua.game")
+    
+    if system.getOS() == "Android" or system.getOS() == "iOS" then
+        love.window.setMode(330, 280, {fullscreen = true})
+        oWidth, oHeight = 480, 360
+    end
     
     newSave("options.json", {audio = true, skin = 1, shakeEnabled = true})
     newSave("score.json", {normal = 0, random = 0, comboNormal = 0, comboRandom = 0})
@@ -33,6 +54,8 @@ function love.load()
         f3 = love.graphics.newImage("/assets/tex/key-f3.png"),
         f3_p = love.graphics.newImage("/assets/tex/key-f31.png"),
         space = love.graphics.newImage("/assets/tex/key-space.png"),
+        mouse = love.graphics.newImage("/assets/tex/mouse.png"),
+        mouse_h = love.graphics.newImage("/assets/tex/mouse_1.png"),
     }
 end
 
@@ -40,12 +63,17 @@ function love.keypressed(key)
     gameKey(key)
 end
 
+function love.mousepressed(x, y, b, istouch)
+    gameMouse(x, y, b, istouch)
+end
+
 function love.update(dt)
     gameLoop(dt)
+    mX, mY = love.mouse.getPosition()
 end
 
 function love.resize(w, h)
-    wWidth, wHeight = w, h
+    lovesize.resize(w, h)
 end
 
 function love.focus(f)
@@ -57,5 +85,29 @@ function love.focus(f)
 end
 
 function love.draw()
+    love.graphics.setCanvas(gWindow)
+    love.graphics.push()
+    love.graphics.setBlendMode("alpha")
+    love.graphics.clear(0, 0, 0, 0)
     gameDisplay()
+    love.graphics.pop()
+    love.graphics.setCanvas()
+    
+    love.graphics.setCanvas(gFull)
+    love.graphics.push()
+    love.graphics.setBlendMode("alpha")
+    love.graphics.clear(0, 0, 0, 0)
+    gameDisplay()
+    love.graphics.pop()
+    love.graphics.setCanvas()
+    
+    lovesize.begin()
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setBlendMode("alpha", "premultiplied")
+    if not love.window.getFullscreen() then
+        love.graphics.draw(gWindow)
+    else
+        love.graphics.draw(gFull)
+    end
+    lovesize.finish()
 end

@@ -1,4 +1,6 @@
 local tableClear = require("table.clear")
+local system = love.system
+
 local progX = (gWidth - 120) / 2
 local judgeY = 132
 
@@ -85,12 +87,12 @@ end
 
 function gameOverlay()
     love.graphics.setColor(0.07, 0.05, 0.08, 0.85)
-    love.graphics.rectangle("fill", 0, 0, wWidth, wHeight)
+    love.graphics.rectangle("fill", 0, 0, oWidth, oHeight)
 end
 
 function lowHealthOverlay()
     love.graphics.setColor(redTint)
-    love.graphics.rectangle("fill", 0, 0, wWidth, wHeight)
+    love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 local pauseW, pauseTime, textColVal = 240, 0, 0.15
@@ -338,18 +340,31 @@ function titleUI()
         else
             love.graphics.draw(tex.f3, 215, 135, 0, 2, 2)
         end
+        if love.mouse.isDown(1) then
+            love.graphics.draw(tex.mouse_h, 150, 139, 0, 2, 2)
+        else
+            love.graphics.draw(tex.mouse, 150, 139, 0, 2, 2)
+        end
         love.graphics.printf("pause game", font[2], 80, 117, gWidth, "left")
         love.graphics.printf("adj. speed", font[2], 0, 117, gWidth - 80, "right")
         love.graphics.printf("hit button", font[2], 80, 173, gWidth, "left")
         love.graphics.printf("toggle vsync", font[2], 0, 173, gWidth - 80, "right")
     end
+    
     -- i'll do anything but clean code
-    love.graphics.printf({{1, 1, 1}, "\n\n\n\n\n\n\n\n\n\n\n\npress ", {0.95, 0.7, 0.4}, "space ", {1, 1, 1}, "to play",}, font[1], 0, 4, gWidth, "center")
+    if system.getOS() == "Android" or system.getOS() == "iOS" then
+        love.graphics.printf({{0.95, 0.7, 0.4}, "\n\n\n\n\n\n\n\n\n\n\n\ntouch ", {1, 1, 1}, "anywhere to play",}, font[1], 0, 4, gWidth, "center")
+    else
+        love.graphics.printf({{1, 1, 1}, "\n\n\n\n\n\n\n\n\n\n\n\npress ", {0.95, 0.7, 0.4}, "space ", {1, 1, 1}, "to play",}, font[1], 0, 4, gWidth, "center")
+    end
     love.graphics.setColor(1, 1, 1, 0.25)
-    love.graphics.printf("<      >", font[2], 0, gHeight - 85, gWidth, "center")
+
+    -- unironically works
+    if TSwitchTimer < math.pi then
+        love.graphics.printf("<      >", font[2], 0, gHeight - 85, gWidth, "center")
+    end
 end
 
---TODO: Add mouse function
 function modeUI()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf("select mode", font[3], 0, 16, gWidth, "center")
@@ -468,7 +483,6 @@ function failUI()
     --TODO: Change color on high score
     love.graphics.printf({{0.95, 0.7, 0.6}, string.format("%.2f", pDisplay) .. "%\n" .. string.format("%02d", math.floor(min)) .. ":" .. string.format("%02d", math.floor(sec))}, font[2], 0, 167, gWidth, "center")
     
-    --TODO: Add buttons on fail menu
     love.graphics.printf({{1, 0.5, 0.25}, "Escape", {1, 1, 1}, " to exit"}, font[2], 0, fTextY + 10, gWidth, "center")
     love.graphics.printf({{0.95, 0.7, 0.2}, "R", {1, 1, 1}, " to restart"}, font[2], 0, fTextY + 27, gWidth, "center")
 end
@@ -476,5 +490,5 @@ end
 function debugUI()
     love.graphics.setColor(1, 1, 1)
     love.graphics.print(love.timer.getFPS() .. " FPS", font[2], 10, 10)
-    love.graphics.print(wWidth .. "x" .. wHeight, font[2], 10, 25)
+    love.graphics.print(love.graphics.getWidth() .. "x" .. love.graphics.getHeight(), font[2], 10, 25)
 end

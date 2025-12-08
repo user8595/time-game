@@ -1,7 +1,8 @@
-wWidth, wHeight = love.graphics.getWidth(), love.graphics.getHeight()
+-- outer width & height
+oWidth, oHeight = 330, 280
 gWidth, gHeight = 330, 280
-tX, tY = (wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23
-ver = "v1.1"
+tX, tY = (oWidth - gWidth) / 2, (oHeight - gHeight) / 2 + 23
+ver = "v1.1.1"
 
 font = {
     love.graphics.newFont("/assets/fonts/monogram.ttf", 22),
@@ -53,6 +54,8 @@ selY = 64
 
 -- option selection
 optSel = 1
+--TODO: Add fullscreen & vsync options
+optPage = 1
 selYOpt = 64
 optionsSave = {}
 
@@ -84,6 +87,10 @@ eX, eY, eW, eH, eT = gWidth / 2 - 29, 6, 48, 48, 0
 -- timing effect object
 timingEffect, pfEffect, msEffect = {}, {}, {}
 tObjCircle = {}
+
+--TODO: Add button objects as bounds
+buttonUI = {}
+
 buttonCol, textCol = {1, 1, 1, 0}, {0, 0, 0, 0}
 buttonRed = {1, 0.25, 0.25, 0}
 

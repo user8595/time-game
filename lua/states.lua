@@ -1,4 +1,6 @@
+local lovesize = require("lib.lovesize")
 local table_clear = require("table.clear")
+local getOS = love.system.getOS()
 local progX = (gWidth - 120) / 2
 local pfP, grP, gdP = 2, 1.95, 1.5
 currP, maxP = 0, 0
@@ -6,13 +8,81 @@ currP, maxP = 0, 0
 -- title screen anim & states
 titleSkin, titleState, titleAnimTime = 1, 1, 0
 
+function timingFunc()
+    if timer > 0.75 and timer < 0.85 then
+        if buttonSkin == 3 then
+            table.insert(tObjCircle, {{0.5, 1, 1, 1}, gWidth / 2 - 5, 85, 26, 0})
+        else
+            table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
+        end
+        good = good + 1
+        lifeBar = lifeBar + 3
+        keyInit()
+        currP = currP + gdP
+        maxP = maxP + pfP
+    end
+    
+    if timer > 0.85 and timer < 0.95 then
+        if buttonSkin == 3 then
+            table.insert(tObjCircle, {{1, 0.5, 0.25, 1}, gWidth / 2 - 5, 85, 26, 0})
+        else
+            table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
+        end
+        great = great + 1
+        lifeBar = lifeBar + 4
+        keyInit()
+        currP = currP + grP
+        maxP = maxP + pfP
+    end
+
+    if timer > 0.95 and timer < 1.05 then
+        if buttonSkin == 3 then
+            table.insert(tObjCircle, {{0.5, 1, 1, 1}, gWidth / 2 - 5, 85, 26, 0})
+        else
+            table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
+        end
+        table.insert(pfEffect, {{0.5, 1, 1, 1}, progX + 88, 58, 13, 18, 0})
+        pf = pf + 1
+        lifeBar = lifeBar + 5
+        keyInit()
+        currP = currP + pfP
+        maxP = maxP + pfP
+    end
+    
+    if timer > 1.05 and timer < 1.15 then
+        if buttonSkin == 3 then
+            table.insert(tObjCircle, {{1, 0.5, 0.25, 1}, gWidth / 2 - 5, 85, 26, 0})
+        else
+            table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
+        end
+        great = great + 1
+        lifeBar = lifeBar + 4
+        keyInit()
+        currP = currP + grP
+        maxP = maxP + pfP
+    end
+
+    if timer > 1.15 and timer < 1.25 then
+        if buttonSkin == 3 then
+            table.insert(tObjCircle, {{0.5, 1, 1, 1}, gWidth / 2 - 5, 85, 26, 0})
+        else
+            table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
+        end
+        good = good + 1
+        lifeBar = lifeBar + 3
+        keyInit()
+        currP = currP + gdP
+        maxP = maxP + pfP
+    end
+end
+
 function gameDisplay()
     -- game
     love.graphics.push()
     love.graphics.translate(tX, tY)
     gameUI()
     love.graphics.pop()
-    
+
     -- background
     if isPaused or isFail or isCountdown or state ~= "game" then
         gameOverlay()
@@ -25,7 +95,7 @@ function gameDisplay()
     
     -- menu & title
     love.graphics.push()
-    love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23)
+    love.graphics.translate((oWidth - gWidth) / 2, (oHeight - gHeight) / 2 + 23)
     if state == "title" then
         titleUI()
     end
@@ -49,14 +119,14 @@ function gameDisplay()
     -- fail screen
     if mode ~= 2 then
         love.graphics.push()
-        love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 8)
+        love.graphics.translate((oWidth - gWidth) / 2, (oHeight - gHeight) / 2 + 8)
             if isFail then
                 failUI()
             end
         love.graphics.pop()
     else
         love.graphics.push()
-        love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 10)
+        love.graphics.translate((oWidth - gWidth) / 2, (oHeight - gHeight) / 2 + 10)
             if isFail then
                 failUI()
             end
@@ -65,7 +135,7 @@ function gameDisplay()
     
     -- pause screen
     love.graphics.push()
-    love.graphics.translate((wWidth - gWidth) / 2, (wHeight - gHeight) / 2)
+    love.graphics.translate((oWidth - gWidth) / 2, (oHeight - gHeight) / 2)
     if isPaused and not isPauseDelay then
         pauseUI()
     end
@@ -78,28 +148,30 @@ function gameDisplay()
 
     for i, txt in ipairs(textInfo) do
         love.graphics.setColor(txt[1])
-        love.graphics.printf(txt[2], font[2], (wWidth - gWidth) / 2, love.graphics.getHeight() - 40 - 20 * (i - 1), gWidth, "center")
+        love.graphics.printf(txt[2], font[2], (oWidth - gWidth) / 2, oHeight - 40 - 20 * (i - 1), gWidth, "center")
     end
 end
 
 function gameKey(key)
-    -- somewhat a workaround
     if key == "f11" then
         if not love.window.getFullscreen() then
-            love.window.setMode(800, 600, {fullscreen = true, fullscreentype = "exclusive"})
-            wWidth, wHeight = 800, 600
+            love.window.setFullscreen(true)
+            oWidth, oHeight = 480, 360
         else
-            love.window.setMode(gWidth, gHeight, {fullscreen = false})
-            wWidth, wHeight = gWidth, gHeight
+            love.window.setFullscreen(false)
+            oWidth, oHeight = 330, 280
         end
     end
 
+    --TODO: Add saving to vsync function
     if key == "f3" then
         if love.window.getVSync() == 0 then
             love.window.setVSync(1)
+            table_clear(textInfo)
             table.insert(textInfo, {{0.65, 1, 0.5, 0.75}, "vsync enabled", 0})
         else
             love.window.setVSync(0)
+            table_clear(textInfo)
             table.insert(textInfo, {{1, 0.5, 0.5, 0.75}, "vsync disabled", 0})
         end
     end
@@ -107,70 +179,8 @@ function gameKey(key)
     if state == "game" then
         if not isPaused and not isFail and not isCountdown then
             if not love.keyboard.hasKeyRepeat() then
-                if key == keys.hit and timer > 0.75 and timer < 0.85 then
-                    if buttonSkin == 3 then
-                        table.insert(tObjCircle, {{0.5, 1, 1, 1}, gWidth / 2 - 5, 85, 26, 0})
-                    else
-                        table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
-                    end
-                    good = good + 1
-                    lifeBar = lifeBar + 3
-                    keyInit()
-                    currP = currP + gdP
-                    maxP = maxP + pfP
-                end
-                
-                if key == keys.hit and timer > 0.85 and timer < 0.95 then
-                    if buttonSkin == 3 then
-                        table.insert(tObjCircle, {{1, 0.5, 0.25, 1}, gWidth / 2 - 5, 85, 26, 0})
-                    else
-                        table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
-                    end
-                    great = great + 1
-                    lifeBar = lifeBar + 4
-                    keyInit()
-                    currP = currP + grP
-                    maxP = maxP + pfP
-                end
-            
-                if key == keys.hit and timer > 0.95 and timer < 1.05 then
-                    if buttonSkin == 3 then
-                        table.insert(tObjCircle, {{0.5, 1, 1, 1}, gWidth / 2 - 5, 85, 26, 0})
-                    else
-                        table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
-                    end
-                    table.insert(pfEffect, {{0.5, 1, 1, 1}, progX + 88, 58, 13, 18, 0})
-                    pf = pf + 1
-                    lifeBar = lifeBar + 5
-                    keyInit()
-                    currP = currP + pfP
-                    maxP = maxP + pfP
-                end
-                
-                if key == keys.hit and timer > 1.05 and timer < 1.15 then
-                    if buttonSkin == 3 then
-                        table.insert(tObjCircle, {{1, 0.5, 0.25, 1}, gWidth / 2 - 5, 85, 26, 0})
-                    else
-                        table.insert(timingEffect, {{1, 0.5, 0.25, 1}, eX, eY, eW, eH, eT})
-                    end
-                    great = great + 1
-                    lifeBar = lifeBar + 4
-                    keyInit()
-                    currP = currP + grP
-                    maxP = maxP + pfP
-                end
-            
-                if key == keys.hit and timer > 1.15 and timer < 1.25 then
-                    if buttonSkin == 3 then
-                        table.insert(tObjCircle, {{0.5, 1, 1, 1}, gWidth / 2 - 5, 85, 26, 0})
-                    else
-                        table.insert(timingEffect, {{0.5, 1, 1, 1}, eX, eY, eW, eH, eT})
-                    end
-                    good = good + 1
-                    lifeBar = lifeBar + 3
-                    keyInit()
-                    currP = currP + gdP
-                    maxP = maxP + pfP
+                if key == keys.hit then
+                    timingFunc()
                 end
             end
             
@@ -374,11 +384,13 @@ function gameKey(key)
         end
 
         if key == "left" then
+            TSwitchTimer = 0
             titleState = titleState - 1
             love.audio.play(se.sel_1)
         end
 
         if key == "right" then
+            TSwitchTimer = 0
             titleState = titleState + 1
             love.audio.play(se.sel_1)
         end
@@ -462,9 +474,47 @@ function gameKey(key)
     end
 end
 
+function gameMouse(x, y, b, istouch)
+    --TODO: Finish touchscreen controls
+    if state == "title" then
+        if b == 1 then
+            --TODO: Tempoary, replace with menu function
+            if getOS == "Android" or getOS == "iOS" then
+                state = "game"
+                isCountdown = true
+                isExit = -1
+                table_clear(timingEffect)
+                table_clear(tObjCircle)
+                love.audio.play(se.sel_1)
+            else
+                state = "mode"
+                mode = 1
+                selY = 64
+                isExit = -1
+                table_clear(timingEffect)
+                table_clear(tObjCircle)
+                love.audio.play(se.sel_1)
+            end
+        end
+    end
+    if state == "game" and not isPaused and not isPauseDelay and not isFail then
+        if b == 1 or istouch then
+            timingFunc()
+        end
+    end
+end
+
+local TSNext = 15.15
+TSwitchTimer = 0
 TButtonCol, TtextCol = {1, 1 ,1, 0}, {0, 0, 0, 0}
 Tb2S = 2.5
 function gameLoop(dt)
+    if not love.window.getFullscreen() then
+        lovesize.set(330, 280)
+    else
+        lovesize.set(480, 360)
+    end
+
     if not isAudio then
         love.audio.setVolume(0)
     else
@@ -479,6 +529,8 @@ function gameLoop(dt)
     end
 
     if state ~= "game" then
+        love.graphics.setBackgroundColor(0.07, 0.05, 0.08, 0.85)
+        TSwitchTimer = TSwitchTimer + dt
         titleAnimTime = titleAnimTime + dt
         TButtonCol[4] = TButtonCol[4] + dt
         TtextCol[4] = TtextCol[4] + dt
@@ -491,6 +543,11 @@ function gameLoop(dt)
 
         if titleState > 2 then
             titleState = 1
+        end
+
+        if TSwitchTimer >= TSNext then
+            titleState = titleState + 1
+            TSNext = TSNext + 15.15
         end
 
         -- title animation
@@ -533,6 +590,11 @@ function gameLoop(dt)
             end
         end
     else
+        if not isCountdown and not isPaused and not isPauseDelay and not isFail then
+            love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
+        else
+            love.graphics.setBackgroundColor(0.07, 0.05, 0.08, 0.85)
+        end
         titleState = 1
         titleSkin = 1
         titleAnimTime = 0
@@ -570,6 +632,8 @@ function gameLoop(dt)
     bpm = 60 * speed
 
     if state == "mode" then
+        table_clear(timingEffect)
+        table_clear(tObjCircle)
         se.sel_2:setPitch(1.25)
     end
     
@@ -613,23 +677,23 @@ function gameLoop(dt)
     if isShake or isShakeHit then
         shakeTime = shakeTime + dt
     else
-        tX, tY = (wWidth - gWidth) / 2, (wHeight - gHeight) / 2 + 23
+        tX, tY = (oWidth - gWidth) / 2, (oHeight - gHeight) / 2 + 23
     end
 
     if shakeTime > 0 and isShake then
-        tX, tY = (wWidth - gWidth) / 2 + love.math.random(2.25, -2.25), (wHeight - gHeight) / 2 + 23 + love.math.random(2.25, -2.25)
+        tX, tY = (oWidth - gWidth) / 2 + love.math.random(2.25, -2.25), (oHeight - gHeight) / 2 + 23 + love.math.random(2.25, -2.25)
     end
     
     if shakeTime > 0 and isShakeHit and speed > 3.5 then
-        tX, tY = (wWidth - gWidth) / 2 + love.math.random(1.25, -1.25), (wHeight - gHeight) / 2 + 23 + love.math.random(1.25, -1.25)
+        tX, tY = (oWidth - gWidth) / 2 + love.math.random(1.25, -1.25), (oHeight - gHeight) / 2 + 23 + love.math.random(1.25, -1.25)
     end
 
     if shakeTime > 0 and isShakeHit and speed > 4.25 then
-        tX, tY = (wWidth - gWidth) / 2 + love.math.random(1.65, -1.65), (wHeight - gHeight) / 2 + 23 + love.math.random(1.65, -1.65)
+        tX, tY = (oWidth - gWidth) / 2 + love.math.random(1.65, -1.65), (oHeight - gHeight) / 2 + 23 + love.math.random(1.65, -1.65)
     end
 
     if shakeTime > 0 and isShakeHit and speed > 4.5 then
-        tX, tY = (wWidth - gWidth) / 2 + love.math.random(2, -2), (wHeight - gHeight) / 2 + 23 + love.math.random(2, -2)
+        tX, tY = (oWidth - gWidth) / 2 + love.math.random(2, -2), (oHeight - gHeight) / 2 + 23 + love.math.random(2, -2)
     end
     
     if shakeTime > 0.05 and isShake then
