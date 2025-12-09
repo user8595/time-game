@@ -5,9 +5,9 @@ tX, tY = (oWidth - gWidth) / 2, (oHeight - gHeight) / 2 + 23
 ver = "v1.1.1"
 
 font = {
-    love.graphics.newFont("/assets/fonts/monogram.ttf", 22),
-    love.graphics.newFont("/assets/fonts/Picopixel.ttf", 14),
-    love.graphics.newFont("/assets/fonts/monogram.ttf", 26),
+  love.graphics.newFont("/assets/fonts/monogram.ttf", 22),
+  love.graphics.newFont("/assets/fonts/Picopixel.ttf", 14),
+  love.graphics.newFont("/assets/fonts/monogram.ttf", 26),
 }
 
 isPaused = false
@@ -19,11 +19,11 @@ isDebug = false
 isShake = false
 isShakeHit = false
 shakeTime = 0
-isExit = 0 -- -1 = mode & popups, 0 = game, 1 = exit game
-backState = 0 -- 0 = initial, 1 = closed from state (permanent)
+isExit = 0      -- -1 = mode & popups, 0 = game, 1 = exit game
+backState = 0   -- 0 = initial, 1 = closed from state (permanent)
 
 state = "title" -- "title", "mode", "game", "options", "about"
-mode = 1 -- 1 = normal, 2 = random, 3 = options, 4 = about
+mode = 1        -- 1 = normal, 2 = random, 3 = options, 4 = about
 buttonTime = 0
 speed = 1
 spdMax = 25
@@ -54,7 +54,6 @@ selY = 64
 
 -- option selection
 optSel = 1
---TODO: Add fullscreen & vsync options
 optPage = 1
 selYOpt = 64
 optionsSave = {}
@@ -64,6 +63,9 @@ overSel = 1
 oYSel = 162
 
 isAudio = true
+--TODO: Add fullscreen & vsync options
+isFullscreen = false
+isVSync = true
 
 width = 120
 pW = width * (timer / 1.25)
@@ -78,7 +80,7 @@ lMObj = {}
 textInfo = {}
 
 keys = {
-    hit = "space",
+  hit = "space",
 }
 
 -- judgement effect variables
@@ -91,20 +93,20 @@ tObjCircle = {}
 --TODO: Add button objects as bounds
 buttonUI = {}
 
-buttonCol, textCol = {1, 1, 1, 0}, {0, 0, 0, 0}
-buttonRed = {1, 0.25, 0.25, 0}
+buttonCol, textCol = { 1, 1, 1, 0 }, { 0, 0, 0, 0 }
+buttonRed = { 1, 0.25, 0.25, 0 }
 
 timingCol = {
-    {1, 0.25, 0.25, 1},
-    {0.5, 1, 1, 1},
-    {1, 0.5, 0.25, 1},
-    {0.25, 0.5, 1, 1},
-    {1, 1, 1, 1}
+  { 1,    0.25, 0.25, 1 },
+  { 0.5,  1,    1,    1 },
+  { 1,    0.5,  0.25, 1 },
+  { 0.25, 0.5,  1,    1 },
+  { 1,    1,    1,    1 }
 }
 
-tipCol = {0.95, 0.7, 0.6}
-white = {1, 1, 1, 1}
-red = {1, 0.25, 0.25, 1}
-redTint = {1, 0, 0, 0}
+tipCol = { 0.95, 0.7, 0.6 }
+white = { 1, 1, 1, 1 }
+red = { 1, 0.25, 0.25, 1 }
+redTint = { 1, 0, 0, 0 }
 
 tCol = timingCol[1]
