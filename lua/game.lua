@@ -24,6 +24,8 @@ local fontCombo = font[2]
 fTextY = 190
 seType = 0
 
+failAcc = { 0.95, 0.7, 0.6 }
+
 function gameInit()
   pf, great, good, miss = 0, 0, 0, 0
   buttonTime = 0
@@ -201,8 +203,8 @@ function gameUI()
 
   love.graphics.setColor(white)
   love.graphics.printf(
-  { timingCol[2], "PF " .. pf, timingCol[3], "\nGR " .. great, timingCol[4], "\nGD " .. good, timingCol[1], "\nMS " ..
-  miss }, font[1], 10, 75, gWidth, "left")
+    { timingCol[2], "PF " .. pf, timingCol[3], "\nGR " .. great, timingCol[4], "\nGD " .. good, timingCol[1], "\nMS " ..
+    miss }, font[1], 10, 75, gWidth, "left")
 
   currLife = (lifeBar / 100)
 
@@ -260,12 +262,13 @@ function gameUI()
 
   love.graphics.setColor(white)
   if pDisplay == 0 then
-    love.graphics.printf({ tipCol, "0%" }, font[2], 10, gHeight - 42, gWidth - 24, "left")
+    love.graphics.printf({ tipCol, "0%", {1, 1, 1, 0.25}, " | ", gradeCol, gameGrade }, font[2], 10, gHeight - 42, gWidth - 24, "left")
   else
-    love.graphics.printf({ tipCol, string.format("%.2f", pDisplay) .. "%" }, font[2], 10, gHeight - 42, gWidth - 24,
+    love.graphics.printf({ tipCol, string.format("%.2f", pDisplay) .. "%", {1, 1, 1, 0.25}, " | ", gradeCol, gameGrade }, font[2], 10, gHeight - 42, gWidth - 24,
       "left")
   end
-  love.graphics.printf({ tipCol, string.format("%02d", math.floor(min)) .. ":" .. string.format("%02d", math.floor(sec)) },
+  love.graphics.printf(
+    { tipCol, string.format("%02d", math.floor(min)) .. ":" .. string.format("%02d", math.floor(sec)) },
     font[2], 0, gHeight - 42, gWidth - 10, "right")
 
   if lastTimer > 0 and not isMiss then
@@ -364,7 +367,8 @@ function titleUI()
       font[1], 0, 4, gWidth, "center")
   else
     love.graphics.printf(
-    { { 1, 1, 1 }, "\n\n\n\n\n\n\n\n\n\n\n\npress ", { 0.95, 0.7, 0.4 }, "space ", { 1, 1, 1 }, "to play", }, font[1], 0,
+      { { 1, 1, 1 }, "\n\n\n\n\n\n\n\n\n\n\n\npress ", { 0.95, 0.7, 0.4 }, "space ", { 1, 1, 1 }, "to play", }, font[1],
+      0,
       4, gWidth, "center")
   end
   love.graphics.setColor(1, 1, 1, 0.25)
@@ -390,31 +394,37 @@ function modeUI()
   if mode == 1 then
     love.graphics.printf(modeStrings[1], font[2], 0, gHeight - 70, gWidth, "center")
     love.graphics.printf(
-    { white, "best perf. ", { 0.5, 1, 1, 1 }, hiPerf.normal, { 1, 1, 1, 0.35 }, " | ", white, "best combo ", { 0.9, 0.45, 0.75, 1 },
-      hiPerf.comboNormal .. "x" }, font[2], 0, gHeight - 90, gWidth, "center")
+      { white, "best perf. ", { 0.5, 1, 1, 1 }, hiPerf.normal, { 1, 1, 1, 0.35 }, " | ", white, "best combo ", { 0.9, 0.45, 0.75, 1 },
+        hiPerf.comboNormal .. "x" }, font[2], 0, gHeight - 90, gWidth, "center")
   elseif mode == 2 then
     love.graphics.printf(modeStrings[2], font[2], 0, gHeight - 70, gWidth, "center")
     if spdMax > 30 then
       if spdMax >= 50 then
         love.graphics.printf(
-        { white, "best perf. ", { 0.5, 1, 1, 1 }, hiPerf.random, { 1, 1, 1, 0.35 }, " | ", { 0.9, 0.45, 0.75, 1 }, hiPerf
-        .comboRandom .. "x", red, "   max ", white, "< ", red, 0.1 * spdMax .. "x " }, font[2], 0, gHeight - 90, gWidth,
+          { white, "best perf. ", { 0.5, 1, 1, 1 }, hiPerf.random, { 1, 1, 1, 0.35 }, " | ", { 0.9, 0.45, 0.75, 1 },
+            hiPerf
+            .comboRandom .. "x", red, "   max ", white, "< ", red, 0.1 * spdMax .. "x " }, font[2], 0, gHeight - 90,
+          gWidth,
           "center")
       else
         love.graphics.printf(
-        { white, "best perf. ", { 0.5, 1, 1, 1 }, hiPerf.random, { 1, 1, 1, 0.35 }, " | ", { 0.9, 0.45, 0.75, 1 }, hiPerf
-        .comboRandom .. "x", red, "   max ", white, "< ", red, 0.1 * spdMax .. "x ", white, ">" }, font[2], 0,
+          { white, "best perf. ", { 0.5, 1, 1, 1 }, hiPerf.random, { 1, 1, 1, 0.35 }, " | ", { 0.9, 0.45, 0.75, 1 },
+            hiPerf
+            .comboRandom .. "x", red, "   max ", white, "< ", red, 0.1 * spdMax .. "x ", white, ">" }, font[2], 0,
           gHeight - 90, gWidth, "center")
       end
     else
       if spdMax <= 15 then
         love.graphics.printf(
-        { white, "best perf. ", { 0.5, 1, 1, 1 }, hiPerf.random, { 1, 1, 1, 0.35 }, " | ", { 0.9, 0.45, 0.75, 1 }, hiPerf
-        .comboRandom .. "x", red, "   max ", white, 0.1 * spdMax .. "x >" }, font[2], 0, gHeight - 90, gWidth, "center")
+          { white, "best perf. ", { 0.5, 1, 1, 1 }, hiPerf.random, { 1, 1, 1, 0.35 }, " | ", { 0.9, 0.45, 0.75, 1 },
+            hiPerf
+            .comboRandom .. "x", red, "   max ", white, 0.1 * spdMax .. "x >" }, font[2], 0, gHeight - 90, gWidth,
+          "center")
       else
         love.graphics.printf(
-        { white, "best perf. ", { 0.5, 1, 1, 1 }, hiPerf.random, { 1, 1, 1, 0.35 }, " | ", { 0.9, 0.45, 0.75, 1 }, hiPerf
-        .comboRandom .. "x", red, "   max ", white, "< " .. 0.1 * spdMax .. "x >" }, font[2], 0, gHeight - 90, gWidth,
+          { white, "best perf. ", { 0.5, 1, 1, 1 }, hiPerf.random, { 1, 1, 1, 0.35 }, " | ", { 0.9, 0.45, 0.75, 1 },
+            hiPerf
+            .comboRandom .. "x", red, "   max ", white, "< " .. 0.1 * spdMax .. "x >" }, font[2], 0, gHeight - 90, gWidth,
           "center")
       end
     end
@@ -470,7 +480,8 @@ function aboutUI()
   love.graphics.draw(tex.logo, gWidth / 2 - 30, gHeight / 2 - 54, 0, 0.23, 0.23)
   love.graphics.printf("time\n", font[3], 0, gHeight / 2 - 124, gWidth, "center")
   love.graphics.printf(
-  { { 0.5, 0.5, 0.5 }, "simple one keyed\ntiming game\n\n\n\n\n\n© 2025 eightyfivenine\nlicensed under the MIT license." },
+    { { 0.5, 0.5, 0.5 },
+      "simple one keyed\ntiming game\n\n\n\n\n\n© 2025 eightyfivenine\nlicensed under the MIT license." },
     font[1], 0, gHeight / 2 - 105, gWidth, "center")
 
   love.graphics.setColor(1, 1, 1, 0.15)
@@ -492,12 +503,13 @@ function pauseUI()
   love.graphics.rectangle("fill", 0, oYSel, gWidth, 26)
 end
 
+local gradeFont = love.graphics.setNewFont("/assets/fonts/Picopixel.ttf", 26)
 function failUI()
   love.graphics.setColor(1, 1, 1)
   love.graphics.printf({ { 0.95, 0.7, 0.4 }, "- RESULTS -" }, font[3], 0, 30, gWidth, "center")
   love.graphics.printf(
-  { timingCol[2], "PF: " .. pf, timingCol[3], "\nGR: " .. great, timingCol[4], "\nGD: " .. good, timingCol[1], "\nMS: " ..
-  miss, { 0.9, 0.45, 0.75, 1 }, "\nMAX COMBO: " .. maxCombo .. "x", { 1, 1, 1 }, "\nTOTAL: " .. pf + great + good },
+    { timingCol[2], "PF: " .. pf, timingCol[3], "\nGR: " .. great, timingCol[4], "\nGD: " .. good, timingCol[1], "\nMS: " ..
+    miss, { 0.9, 0.45, 0.75, 1 }, "\nMAX COMBO: " .. maxCombo .. "x", { 1, 1, 1 }, "\nTOTAL: " .. pf + great + good },
     font[1], 0, 58, gWidth, "center")
 
   if mode == 2 then
@@ -508,12 +520,11 @@ function failUI()
     end
   end
 
-  --TODO: Change color on high score
   love.graphics.printf(
-  { { 0.95, 0.7, 0.6 }, string.format("%.2f", pDisplay) ..
-  "%\n" .. string.format("%02d", math.floor(min)) .. ":" .. string.format("%02d", math.floor(sec)) }, font[2], 0, 167,
+    { failAcc, string.format("%.2f", pDisplay) ..
+    "%\n" .. string.format("%02d", math.floor(min)) .. ":" .. string.format("%02d", math.floor(sec)) }, font[2], 0, 167,
     gWidth, "center")
-
+  love.graphics.print({gradeCol, gameGrade}, gradeFont, 120, 170)
   love.graphics.printf({ { 1, 0.5, 0.25 }, "Escape", { 1, 1, 1 }, " to exit" }, font[2], 0, fTextY + 10, gWidth, "center")
   love.graphics.printf({ { 0.95, 0.7, 0.2 }, "R", { 1, 1, 1 }, " to restart" }, font[2], 0, fTextY + 27, gWidth, "center")
 end

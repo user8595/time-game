@@ -455,13 +455,13 @@ function gameKey(key)
         oYSel = oYSel + 26
         love.audio.play(se.sel_1)
       end
-    end
-    if key == "return" or key == keys.hit then
-      if overSel == 1 then
-        isPauseDelay = true
-        love.audio.play(se.sel_1)
-        overSel = 1
-        oYSel = 162
+      if key == "return" or key == keys.hit then
+        if overSel == 1 then
+          isPauseDelay = true
+          love.audio.play(se.sel_1)
+          overSel = 1
+          oYSel = 162
+        end
       end
       if overSel == 2 then
         gameInit()
@@ -552,6 +552,7 @@ function gameMouse(x, y, b, istouch)
 end
 
 local TSNext = 15.15
+local failRShift = 0.5
 TSwitchTimer = 0
 TButtonCol, TtextCol = { 1, 1, 1, 0 }, { 0, 0, 0, 0 }
 Tb2S = 2.5
@@ -573,6 +574,17 @@ function gameLoop(dt)
     if txt[3] > 1 then
       table.remove(textInfo, i)
     end
+  end
+
+  if pDisplay > 85 then
+    failAcc[1] = failAcc[1] + dt * failRShift
+    failAcc[2] = failAcc[2] + dt * failRShift
+    failAcc[3] = failAcc[3] + dt * failRShift
+    if failAcc[1] > 0.95 or failAcc[1] < 0.5 then
+      failRShift = -failRShift
+    end
+  else
+    failAcc = { 0.85, 0.7, 0.6 }
   end
 
   if state ~= "game" then
@@ -616,6 +628,8 @@ function gameLoop(dt)
     -- ctrl + c - v
     for i, v in ipairs(timingEffect) do
       v[6] = v[6] + dt
+      v[4], v[5] = v[4] + dt * 20, v[5] + dt * 20
+      v[2], v[3] = v[2] - dt * 10, v[3] - dt * 10
 
       if v[6] > 0 then
         v[1][4] = v[1][4] - dt * 3
@@ -627,6 +641,7 @@ function gameLoop(dt)
     end
     for i, v in ipairs(tObjCircle) do
       v[5] = v[5] + dt
+      v[4] = v[4] + dt * 20
 
       if v[5] > 0 then
         v[1][4] = v[1][4] - dt * 3
@@ -654,6 +669,36 @@ function gameLoop(dt)
     else
       love.keyboard.setKeyRepeat(false)
     end
+  end
+
+  -- game grading
+  if pDisplay > 95 then
+    gameGrade = "SS"
+    gradeCol = { 0.95, 0.95, 0.95 }
+  end
+  if pDisplay < 95 and pDisplay > 93 then
+    gameGrade = "S"
+    gradeCol = { 1, 1, 0.45 }
+  end
+  if pDisplay < 93 and pDisplay > 85 then
+    gameGrade = "A"
+    gradeCol = { 0.5, 1, 0.5 }
+  end
+  if pDisplay < 85 and pDisplay > 75 then
+    gameGrade = "B"
+    gradeCol = { 0.4, 0.4, 0.85 }
+  end
+  if pDisplay < 75 and pDisplay > 65 then
+    gameGrade = "C"
+    gradeCol = { 0.9, 0.45, 0.75 }
+  end
+  if pDisplay < 65 and pDisplay > 50 then
+    gameGrade = "D"
+    gradeCol = { 0.65, 0.4, 0.25 }
+  end
+  if pDisplay < 50 then
+    gameGrade = "F"
+    gradeCol = { 1, 0.25, 0.25 }
   end
 
   if state == "options" then
@@ -933,6 +978,8 @@ function gameLoop(dt)
 
     for i, v in ipairs(timingEffect) do
       v[6] = v[6] + dt
+      v[4], v[5] = v[4] + dt * 20, v[5] + dt * 20
+      v[2], v[3] = v[2] - dt * 10, v[3] - dt * 10
 
       if v[6] > 0 then
         v[1][4] = v[1][4] - dt * 3
@@ -945,6 +992,7 @@ function gameLoop(dt)
 
     for i, v in ipairs(tObjCircle) do
       v[5] = v[5] + dt
+      v[4] = v[4] + dt * 20
 
       if v[5] > 0 then
         v[1][4] = v[1][4] - dt * 3
@@ -957,6 +1005,8 @@ function gameLoop(dt)
 
     for i, v in ipairs(pfEffect) do
       v[6] = v[6] + dt
+      v[4], v[5] = v[4] + dt * 15, v[5] + dt * 15
+      v[2], v[3] = v[2] - dt * (15 / 2), v[3] - dt * (15 / 2)
 
       if v[6] > 0 then
         v[1][4] = v[1][4] - dt * 3
@@ -969,6 +1019,8 @@ function gameLoop(dt)
 
     for i, v in ipairs(msEffect) do
       v[6] = v[6] + dt
+      v[4], v[5] = v[4] + dt * 20, v[5] + dt * 20
+      v[2], v[3] = v[2] - dt * 10, v[3] - dt * 10
 
       if v[6] > 0 then
         v[1][4] = v[1][4] - dt * 3

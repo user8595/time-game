@@ -74,6 +74,10 @@ pf, great, good, miss = 0, 0, 0, 0
 lifeBar = 100
 lMObj = {}
 
+-- grade
+gameGrade = ""
+gradeCol = {0.95, 0.95, 0.95}
+
 -- text info
 textInfo = {}
 
