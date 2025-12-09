@@ -532,19 +532,11 @@ end
 function gameMouse(x, y, b, istouch)
   --TODO: Finish touchscreen controls
   if state == "title" then
-    if b == 1 then
+    if istouch then
       --TODO: Tempoary, replace with menu function
       if getOS == "Android" or getOS == "iOS" then
         state = "game"
         isCountdown = true
-        isExit = -1
-        table_clear(timingEffect)
-        table_clear(tObjCircle)
-        love.audio.play(se.sel_1)
-      else
-        state = "mode"
-        mode = 1
-        selY = 64
         isExit = -1
         table_clear(timingEffect)
         table_clear(tObjCircle)

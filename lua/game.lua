@@ -429,23 +429,21 @@ function optionsUI()
   love.graphics.setColor({ 1, 1, 1 })
   love.graphics.printf("options", font[3], 0, 16, gWidth, "center")
 
-  if optPage == 1 then
-    love.graphics.printf("sound", font[3], 40, 64, gWidth - 40, "left")
-    if isAudio then
-      love.graphics.printf("on", font[3], gWidth - 100, 64, 100, "center")
-    else
-      love.graphics.printf("off", font[3], gWidth - 100, 64, 100, "center")
-    end
+  love.graphics.printf("sound", font[3], 40, 64, gWidth - 40, "left")
+  if isAudio then
+    love.graphics.printf("on", font[3], gWidth - 100, 64, 100, "center")
+  else
+    love.graphics.printf("off", font[3], gWidth - 100, 64, 100, "center")
+  end
 
-    love.graphics.printf("skin", font[3], 40, 64 + 26, gWidth - 40, "left")
-    love.graphics.printf(buttonSkin, font[3], 40, 64 + 26, gWidth - 85, "right")
+  love.graphics.printf("skin", font[3], 40, 64 + 26, gWidth - 40, "left")
+  love.graphics.printf(buttonSkin, font[3], 40, 64 + 26, gWidth - 85, "right")
 
-    love.graphics.printf("screenshake", font[3], 40, 64 + 26 * 2, gWidth - 40, "left")
-    if shakeEnabled then
-      love.graphics.printf("on", font[3], gWidth - 100, 64 + 26 * 2, 100, "center")
-    else
-      love.graphics.printf("off", font[3], gWidth - 100, 64 + 26 * 2, 100, "center")
-    end
+  love.graphics.printf("screenshake", font[3], 40, 64 + 26 * 2, gWidth - 40, "left")
+  if shakeEnabled then
+    love.graphics.printf("on", font[3], gWidth - 100, 64 + 26 * 2, 100, "center")
+  else
+    love.graphics.printf("off", font[3], gWidth - 100, 64 + 26 * 2, 100, "center")
   end
 
   love.graphics.printf("back", font[3], 0, 64 + 26 * 3 + 16, gWidth, "center")

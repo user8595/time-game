@@ -54,7 +54,6 @@ selY = 64
 
 -- option selection
 optSel = 1
-optPage = 1
 selYOpt = 64
 optionsSave = {}
 
@@ -63,7 +62,6 @@ overSel = 1
 oYSel = 162
 
 isAudio = true
---TODO: Add fullscreen & vsync options
 isFullscreen = false
 isVSync = true
 
