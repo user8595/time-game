@@ -5,6 +5,7 @@ local getOS = love.system.getOS()
 function love.load()
   local system = love.system
   love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
+  
   -- TODO: Finish mobile support
   if getOS == "Android" or getOS == "iOS" then
     love.graphics.setDefaultFilter("linear", "linear")
@@ -50,10 +51,12 @@ function love.load()
   -- game audio
   se = {
     miss = love.audio.newSource("/assets/se/miss.wav", "static"),
+    miss_bass = love.audio.newSource("/assets/se/miss_bass.wav", "static"),
     hit_1 = love.audio.newSource("/assets/se/hit_1.wav", "static"),
     hit_2 = love.audio.newSource("/assets/se/hit_2.wav", "static"),
     sel_1 = love.audio.newSource("/assets/se/sel_1.wav", "static"),
     sel_2 = love.audio.newSource("/assets/se/sel_2.wav", "static"),
+    sel_confirm = love.audio.newSource("/assets/se/sel_confirm.wav", "static"),
   }
   -- textures
   tex = {

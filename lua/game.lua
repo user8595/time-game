@@ -52,7 +52,7 @@ function gameInit()
   isPaused = false
   isFail = false
   se.miss:setPitch(1)
-  se.sel_2:setPitch(1.25)
+  se.sel_2:setPitch(1)
 end
 
 function keyInit()
@@ -456,6 +456,8 @@ function optionsUI()
     love.graphics.printf("off", font[3], gWidth - 100, 64 + 26 * 2, 100, "center")
   end
 
+  -- TODO: Add fullscreen, vsync & game window size in options menu
+
   love.graphics.printf("back", font[3], 0, 64 + 26 * 3 + 16, gWidth, "center")
 
   love.graphics.setColor(1, 1, 1, 0.15)
@@ -524,7 +526,7 @@ function failUI()
     { failAcc, string.format("%.2f", pDisplay) ..
     "%\n" .. string.format("%02d", math.floor(min)) .. ":" .. string.format("%02d", math.floor(sec)) }, font[2], 0, 167,
     gWidth, "center")
-  love.graphics.print({gradeCol, gameGrade}, gradeFont, 120, 170)
+  love.graphics.printf({gradeCol, gameGrade}, gradeFont, 0, 170, 135, "right")
   love.graphics.printf({ { 1, 0.5, 0.25 }, "Escape", { 1, 1, 1 }, " to exit" }, font[2], 0, fTextY + 10, gWidth, "center")
   love.graphics.printf({ { 0.95, 0.7, 0.2 }, "R", { 1, 1, 1 }, " to restart" }, font[2], 0, fTextY + 27, gWidth, "center")
 end

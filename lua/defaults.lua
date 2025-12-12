@@ -2,7 +2,7 @@
 oWidth, oHeight = 330, 280
 gWidth, gHeight = 330, 280
 tX, tY = (oWidth - gWidth) / 2, (oHeight - gHeight) / 2 + 23
-ver = "v1.1.1"
+ver = "v1.1.2"
 
 font = {
   love.graphics.newFont("/assets/fonts/monogram.ttf", 22),
@@ -15,7 +15,11 @@ isPauseDelay = false
 isCountdown = false
 countdownCool = 0
 isFail = false
-isDebug = false
+if arg[2] == "debug" then
+  isDebug = true
+else
+  isDebug = false
+end
 isShake = false
 isShakeHit = false
 shakeTime = 0
@@ -58,6 +62,7 @@ selYOpt = 64
 optionsSave = {}
 
 -- pause & fail selection
+-- "overlay selection"
 overSel = 1
 oYSel = 162
 

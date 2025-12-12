@@ -427,7 +427,7 @@ function gameKey(key)
       isExit = -1
       table_clear(timingEffect)
       table_clear(tObjCircle)
-      love.audio.play(se.sel_1)
+      love.audio.play(se.sel_confirm)
     end
 
     if key == "left" then
@@ -462,21 +462,21 @@ function gameKey(key)
           overSel = 1
           oYSel = 162
         end
-      end
-      if overSel == 2 then
-        gameInit()
-        isCountdown = true
-        love.audio.play(se.sel_2)
-        overSel = 1
-        oYSel = 162
-      end
-      if overSel == 3 then
-        state = "mode"
-        isExit = -1
-        love.audio.play(se.sel_2)
-        gameInit()
-        overSel = 1
-        oYSel = 162
+        if overSel == 2 then
+          gameInit()
+          isCountdown = true
+          love.audio.play(se.sel_2)
+          overSel = 1
+          oYSel = 162
+        end
+        if overSel == 3 then
+          state = "mode"
+          isExit = -1
+          love.audio.play(se.sel_2)
+          gameInit()
+          overSel = 1
+          oYSel = 162
+        end
       end
     end
   end
@@ -628,8 +628,8 @@ function gameLoop(dt)
     -- ctrl + c - v
     for i, v in ipairs(timingEffect) do
       v[6] = v[6] + dt
-      v[4], v[5] = v[4] + dt * 20, v[5] + dt * 20
-      v[2], v[3] = v[2] - dt * 10, v[3] - dt * 10
+      v[4], v[5] = v[4] + dt * 20, v[5] + dt * 30
+      v[2], v[3] = v[2] - dt * 10, v[3] - dt * 15
 
       if v[6] > 0 then
         v[1][4] = v[1][4] - dt * 3
@@ -672,7 +672,11 @@ function gameLoop(dt)
   end
 
   -- game grading
-  if pDisplay > 95 then
+  if pDisplay >= 98.25 then
+    gameGrade = "X"
+    gradeCol = { 0.95, 0.95, 0.95 }
+  end
+  if pDisplay > 95 and pDisplay < 98.25 then
     gameGrade = "SS"
     gradeCol = { 0.95, 0.95, 0.95 }
   end
@@ -726,7 +730,6 @@ function gameLoop(dt)
   if state == "mode" then
     table_clear(timingEffect)
     table_clear(tObjCircle)
-    se.sel_2:setPitch(1.25)
   end
 
   pauseDelayFunc(dt)
@@ -852,7 +855,7 @@ function gameLoop(dt)
   end
 
   if countdownCool > 1 and countdownCool < 1.025 then
-    se.sel_2:setPitch(1)
+    se.sel_2:setPitch(0.87)
     love.audio.play(se.sel_2)
   end
 
@@ -904,6 +907,8 @@ function gameLoop(dt)
         combo = 0
         isMiss = true
         love.audio.play(se.miss)
+        -- i hear nothing
+        love.audio.play(se.miss_bass)
         if shakeEnabled then
           isShake = true
         end
@@ -924,6 +929,7 @@ function gameLoop(dt)
         speed = 1
         combo = 0
         love.audio.play(se.miss)
+        love.audio.play(se.miss_bass)
         if shakeEnabled then
           isShake = true
         end
@@ -978,8 +984,8 @@ function gameLoop(dt)
 
     for i, v in ipairs(timingEffect) do
       v[6] = v[6] + dt
-      v[4], v[5] = v[4] + dt * 20, v[5] + dt * 20
-      v[2], v[3] = v[2] - dt * 10, v[3] - dt * 10
+      v[4], v[5] = v[4] + dt * 20, v[5] + dt * 30
+      v[2], v[3] = v[2] - dt * 10, v[3] - dt * 15
 
       if v[6] > 0 then
         v[1][4] = v[1][4] - dt * 3
